@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# BSIM4 paramchk log written by ngspice next to the netlist
+bsim4*.out
