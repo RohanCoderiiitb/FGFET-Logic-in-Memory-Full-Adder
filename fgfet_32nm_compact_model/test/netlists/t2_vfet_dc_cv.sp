@@ -1,5 +1,5 @@
 * T2: VFET Id-Vg (Vds = 0.05 V, 1 V) and Cgg-Vg (Vds = 0), W = 1 um
-.include ../../vfet_32nm.pm
+.include ../../models/vfet_32nm.pm
 vd d 0 0.05
 vg g 0 dc 0 ac 1
 m1 d g 0 0 vfet_nmos w=1u l=100.2n

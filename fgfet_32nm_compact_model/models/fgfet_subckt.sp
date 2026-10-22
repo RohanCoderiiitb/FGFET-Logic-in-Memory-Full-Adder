@@ -28,7 +28,7 @@
 .include sfet_32nm.pm
 .include vfet_32nm.pm
 
-.model cva_fgfet cva_cap Cmax=5.74818e-17 Cmin=1.77441e-15 Vfb=0.318248 Vslp=0.0919169
+.model cva_fgfet cva_cap Cmax=8.50298e-17 Cmin=1.81375e-15 Vfb=0.339355 Vslp=0.0787248
 
 .subckt FGFET WL DL SL SS B params: w_dev=64n delvto_val=0
 * 1. vertical access FET: drain = DL, gate = WL, source = memory node MN

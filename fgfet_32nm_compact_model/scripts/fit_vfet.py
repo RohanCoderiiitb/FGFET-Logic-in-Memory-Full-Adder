@@ -42,6 +42,12 @@ FIXED = {
     # is ~1 um, so the PTM dsub = 0.1 would multiply eta0 by ~300 (runaway DIBL);
     # dsub = 1 keeps the DIBL factor O(1) so eta0 alone sets it.
     "dvt0": 0.0, "dvtp0": 0.0, "dsub": 1.0,
+    # capmod = 2 adds bulk-MOSFET charge-centroid / surface-potential (DeltaPhi)
+    # corrections that assume a doped body; with the undoped pillar's k1 ~ 0 the
+    # DeltaPhi term blows up and distorts the moderate-inversion C-V (Fig. 2d fit
+    # stuck at ~5.8 % rms). capmod = 1 keeps the noff/voffcv weak-inversion form
+    # without those corrections.
+    "capmod": 1,
 }
 
 IV_FREE = [
@@ -64,8 +70,8 @@ CV_FREE = [
     ("cgsl", 1e-13, 3e-10, True),
     ("ckappas", 0.02, 3.0, True),     # ckappad tied
     ("voffcv", -0.5, 0.5, False),
+    # noff * n ~ 3.4-3.9 from the exponential C-V onset of Fig. 2(d) (0.70-0.95 V)
     ("noff", 0.3, 4.0, False),
-    ("acde", 0.1, 3.0, False),
     # phin lowers VFBzb = vth0 - phis - k1*sqrt(phis): the floating, undoped pillar
     # cannot accumulate, so Cgg must stay at the overlap level below threshold.
     ("phin", 0.0, 2.0, False),

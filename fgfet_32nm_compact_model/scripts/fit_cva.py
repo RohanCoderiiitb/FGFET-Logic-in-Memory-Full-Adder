@@ -159,16 +159,25 @@ class CvaFit:
                                for vdl, pts in TARGETS.items()])
 
 
+# The objective has several basins: a single start from the guide's guess can land
+# in one with the stored-'1' read level ~0.25 V off. Deterministic multi-start.
+N_STARTS, SEED = 6, 7
+
+
 def main():
     f = CvaFit()
-    u0 = f.to_u(CVA0)
-    r0 = f.residual(u0)
-    sol = least_squares(f.residual, u0, bounds=(0, 1), diff_step=1e-3)
+    rng = np.random.default_rng(SEED)
+    starts = [f.to_u(CVA0)] + [rng.uniform(0.1, 0.9, len(f.keys)) for _ in range(N_STARTS - 1)]
+    r0 = f.residual(starts[0])
+    sol = min((least_squares(f.residual, u0, bounds=(0, 1), diff_step=1e-3, max_nfev=100) for u0 in starts),
+              key=lambda s: np.sum(s.fun ** 2))
     c = f.to_c(sol.x)
-    print(f"C_VA fit: weighted rms {np.sqrt(np.mean(r0**2)):.4f} -> {np.sqrt(np.mean(sol.fun**2)):.4f} V")
+    print(f"C_VA fit: weighted rms {np.sqrt(np.mean(r0**2)):.4f} -> {np.sqrt(np.mean(sol.fun**2)):.4f} V"
+          f" (best of {N_STARTS} starts)")
     for k in f.keys:
         print(f"    {k:5s} = {c[k]:.5g}")
     t, v = f.simulate(c)
+    print(f"  initialize kick peak: {max(v[vdl][t < 0.1e-6].max() for vdl in v):.3f} V (TCAD marker 0.60 V)")
     for vdl, pts in TARGETS.items():
         print(f"  V_DL = {vdl} V")
         for tt, vt, _ in pts:

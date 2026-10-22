@@ -6,7 +6,7 @@
 * Si3N4 S/D barrier transport is lumped into u0 / rdsw / vsat; junctions and GIDL disabled.
 .model  vfet_nmos  nmos  level = 54
 +version = 4.0               binunit = 1                 paramchk= 1                 mobmod  = 0
-+capmod  = 2                 igcmod  = 0                 igbmod  = 0                 geomod  = 1
++capmod  = 1                 igcmod  = 0                 igbmod  = 0                 geomod  = 1
 +diomod  = 1                 rdsmod  = 0                 rbodymod= 0                 rgatemod= 0
 +permod  = 1                 acnqsmod= 0                 trnqsmod= 0                 tnom    = 27
 +toxe    = 1e-08             toxp    = 1e-08             toxm    = 1e-08             dtox    = 0
@@ -14,23 +14,23 @@
 +wl      = 0                 lln     = 1                 wln     = 1                 lw      = 0
 +ww      = 0                 lwn     = 1                 wwn     = 1                 lwl     = 0
 +wwl     = 0                 xpart   = 0                 toxref  = 1e-08             xl      = 0
-+vth0    = 1.18248           k1      = 0.01              k2      = 0                 k3      = 0
++vth0    = 1.18175           k1      = 0.01              k2      = 0                 k3      = 0
 +k3b     = 0                 w0      = 2.5e-006          dvt0    = 0                 dvt1    = 2
 +dvt2    = 0                 dvt0w   = 0                 dvt1w   = 0                 dvt2w   = 0
 +dsub    = 1                 minv    = 0.05              voffl   = 0                 dvtp0   = 0
 +dvtp1   = 0.1               lpe0    = 0                 lpeb    = 0                 xj      = 2.5e-08
-+ngate   = 1e+023            ndep    = 1e+15             nsd     = 2e+20             phin    = 0.418857
-+cdsc    = 0                 cdscb   = 0                 cdscd   = 0                 cit     = -0.000549195
-+voff    = -0.299789         nfactor = 2.508             eta0    = 0.000712774       etab    = 0
-+vfb     = -0.55             u0      = 0.0499975         ua      = -9.9939e-10       ub      = 1.2e-018
-+uc      = 0                 vsat    = 10126.2           a0      = 1                 ags     = 0
++ngate   = 1e+023            ndep    = 1e+15             nsd     = 2e+20             phin    = 0.457907
++cdsc    = 0                 cdscb   = 0                 cdscd   = 0                 cit     = -0.000543619
++voff    = -0.299789         nfactor = 2.508             eta0    = 0.000671917       etab    = 0
++vfb     = -0.55             u0      = 0.0499974         ua      = -9.9939e-10       ub      = 1.2e-018
++uc      = 0                 vsat    = 9783.56           a0      = 1                 ags     = 0
 +a1      = 0                 a2      = 1                 b0      = 0                 b1      = 0
-+keta    = 0.04              dwg     = 0                 dwb     = 0                 pclm    = 0.00546737
++keta    = 0.04              dwg     = 0                 dwb     = 0                 pclm    = 0.00509467
 +pdiblc1 = 0.001             pdiblc2 = 0.001             pdiblcb = -0.005            drout   = 0.5
 +pvag    = 1e-020            delta   = 0.01              pscbe1  = 8.14e+008         pscbe2  = 1e-007
 +fprout  = 0.2               pdits   = 0.01              pditsd  = 0.23              pditsl  = 2300000
-+rsh     = 5                 rdsw    = 7.00159e+07       rsw     = 75                rdw     = 75
-+rdswmin = 0                 rdwmin  = 0                 rswmin  = 0                 prwg    = 0.521839
++rsh     = 5                 rdsw    = 7.0309e+07        rsw     = 75                rdw     = 75
++rdswmin = 0                 rdwmin  = 0                 rswmin  = 0                 prwg    = 0.527789
 +prwb    = 0                 wr      = 1                 alpha0  = 0.074             alpha1  = 0.005
 +beta0   = 30                agidl   = 0                 bgidl   = 2.3e+09           cgidl   = 0.5
 +egidl   = 0.8               aigbacc = 0.012             bigbacc = 0.0028            cigbacc = 0.002
@@ -38,10 +38,10 @@
 +eigbinv = 1.1               nigbinv = 3                 aigc    = 0.020014          bigc    = 0.0027432
 +cigc    = 0.002             aigsd   = 0.020014          bigsd   = 0.0027432         cigsd   = 0.002
 +nigc    = 1                 poxedge = 1                 pigcd   = 1                 ntox    = 1
-+xrcrg1  = 12                xrcrg2  = 5                 cgso    = 5.89326e-12       cgdo    = 5.89326e-12
-+cgbo    = 2.56e-011         cgdl    = 1.66331e-10       cgsl    = 1.66331e-10       ckappas = 0.0205786
-+ckappad = 0.0205786         acde    = 0.604441          moin    = 15                noff    = 3.99777
-+voffcv  = -0.306268         kt1     = -0.11             kt1l    = 0                 kt2     = 0.022
++xrcrg1  = 12                xrcrg2  = 5                 cgso    = 5.00976e-11       cgdo    = 5.00976e-11
++cgbo    = 2.56e-011         cgdl    = 7.63676e-11       cgsl    = 7.63676e-11       ckappas = 0.0495011
++ckappad = 0.0495011         acde    = 1                 moin    = 15                noff    = 4
++voffcv  = -0.168715         kt1     = -0.11             kt1l    = 0                 kt2     = 0.022
 +ute     = -1.5              ua1     = 4.31e-009         ub1     = 7.61e-018         uc1     = -5.6e-011
 +prt     = 0                 at      = 33000             fnoimod = 1                 tnoimod = 0
 +jss     = 0                 jsws    = 0                 jswgs   = 0                 njs     = 1
@@ -58,5 +58,5 @@
 +dmdg    = 0                 dmcgt   = 0                 dwj     = 0                 xgw     = 0
 +xgl     = 0                 rshg    = 0.4               gbmin   = 1e-010            rbpb    = 5
 +rbpd    = 15                rbps    = 15                rbdb    = 15                rbsb    = 15
-+ngcon   = 1                 dwc     = 0                 dlc     = 4.32574e-10       cf      = 4.77978e-12
++ngcon   = 1                 dwc     = 0                 dlc     = -6.86759e-10      cf      = 3.16597e-11
 
