@@ -1,0 +1,11 @@
+*.raw
+*.log
+*.net
+*.op.raw
+_sw_*
+__pycache__/
+# re-sized duplicate of the schematic and everything it produces (not part of the committed report)
+full_adder_atype_sized*
+results/full_adder_atype_sized/
+scripts/fit_sizing.py
+__pycache__/

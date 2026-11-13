@@ -1,0 +1,34 @@
+* =====================================================================
+* FGFET equivalent subcircuit for LTspice - Fig. 1(c) of Kim et al., IEEE Access 2023
+* LTspice port of models/fgfet_subckt.sp (ngspice + OSDI).
+*
+* LTspice has no Verilog-A / OSDI, so the Verilog-A coupling capacitor C_VA
+* (models/cva_cap.va) is written as a charge-defined capacitor (C ... Q={...}).
+* The charge is the same closed form the .va file integrates:
+*     C(v) = Cmin + (Cmax-Cmin)/2 * (1 + tanh((v-Vfb)/Vslp))
+*     q(v) = W * ( (Cmax+Cmin)/2 * v + (Cmax-Cmin)/2 * Vslp * ln(cosh((v-Vfb)/Vslp)) )
+* with ln(cosh(x)) = |x| + ln(1+exp(-2|x|)) - ln 2, and v = V(WL) - V(MN) (= x in LTspice).
+* The BSIM4 cards are the unchanged ngspice-fitted cards (LTspice's BSIM4 reproduces
+* them to ~5 digits).
+*
+* Terminals: WL DL SL SS B     (word line, data line, sense line, SFET source, bulk)
+* Parameters: w_dev (width of VFET = SFET = C_VA), delvto_val (SFET Vth shift)
+*
+* The netlist that includes this file must set  .options gmin=1e-15 chgtol=1e-18
+* (see fgfet_32nm_compact_model/README.md, "Simulator settings").
+* =====================================================================
+.include sfet_32nm.pm
+.include vfet_32nm.pm
+
+.param cva_Cmax=8.50298e-17 cva_Cmin=1.81375e-15 cva_Vfb=0.339355 cva_Vslp=0.0787248
+
+.subckt FGFET WL DL SL SS B params: w_dev=64n delvto_val=0
+* 1. vertical access FET: drain = DL, gate = WL, source = memory node MN
+M_VFET DL WL MN B vfet_nmos L=100.2n W={w_dev}
+* 2. sense FET: drain = SL, gate = MN, source = SS
+M_SFET SL MN SS B sfet_nmos L=32n W={w_dev} delvto={delvto_val}
+* 3. WL-MN coupling capacitor C_VA (charge form of cva_cap.va); x = V(WL)-V(MN)
+C_CVA WL MN Q={(w_dev/1u)*(0.5*(cva_Cmax+cva_Cmin)*x+0.5*(cva_Cmax-cva_Cmin)*cva_Vslp*(abs((x-cva_Vfb)/cva_Vslp)+ln(1+exp(-2*abs((x-cva_Vfb)/cva_Vslp)))-ln(2)))}
+* 4. 1000 TOhm DC path so the floating node has a defined operating point
+R_conv MN 0 1000T
+.ends FGFET
