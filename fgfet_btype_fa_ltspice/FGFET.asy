@@ -1,0 +1,32 @@
+Version 4
+SymbolType CELL
+RECTANGLE Normal -32 0 64 96
+LINE Normal -32 32 -16 32
+LINE Normal -32 64 -16 64
+LINE Normal 48 0 48 16
+LINE Normal 48 80 48 96
+LINE Normal 48 48 64 48
+RECTANGLE Normal 16 28 40 68
+LINE Normal 28 28 28 68
+TEXT 4 14 Center 1 SFET
+TEXT -8 82 Left 1 VFET
+WINDOW 0 -32 -16 Left 2
+WINDOW 3 72 80 Left 2
+SYMATTR Prefix X
+SYMATTR Value FGFET
+SYMATTR Description Floating-gate FET (Kim et al. 2023): VFET + SFET + coupling cap C_VA. Pins WL DL SL SS B
+PIN -32 32 LEFT 8
+PINATTR PinName WL
+PINATTR SpiceOrder 1
+PIN -32 64 LEFT 8
+PINATTR PinName DL
+PINATTR SpiceOrder 2
+PIN 48 0 TOP 8
+PINATTR PinName SL
+PINATTR SpiceOrder 3
+PIN 48 96 BOTTOM 8
+PINATTR PinName SS
+PINATTR SpiceOrder 4
+PIN 64 48 RIGHT 8
+PINATTR PinName B
+PINATTR SpiceOrder 5
