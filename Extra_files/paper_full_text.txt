@@ -1,0 +1,568 @@
+=== PAGE 1 ===
+Received 21 June 2023, accepted 28 July 2023, date of publication 31 August 2023, date of current version 13 September 2023.
+Digital Object Identifier 10.1109/ACCESS.2023.3310823
+Analysis of Logic-in-Memory Full Adder Circuit
+With Floating Gate Field Effect Transistor (FGFET)
+SUEYEON KIM
+ 1, INSOO CHOI1, SANGKI CHO1,
+MYOUNGGON KANG
+ 2, (Senior Member, IEEE), SEUNGJAE BAIK3,
+CHANGHO RA4, AND JONGWOOK JEON
+ 4
+1Department of Electrical and Electronics Engineering, Konkuk University, Seoul 05029, South Korea
+2Department of Electronics Engineering, Korea National University of Transportation, Chungju-si 27469, South Korea
+3Semiconductor Research and Development Center, Samsung Electronics, Hwasung-si 18448, South Korea
+4School of Electronic and Electrical Engineering, Sungkyunkwan University, Suwon-si 16419, South Korea
+Corresponding authors: Changho Ra (wocwoc3@gmail.com) and Jongwook Jeon (voix0707@skku.edu)
+This work was supported in part by the National Research and Development Program through the National Research Foundation of Korea
+(NRF) funded by the Ministry of Science and ICT under Grant 2021M3F3A2A03017693, and in part by IC Design Education Center
+(IDEC).
+ABSTRACT The high data throughput and high energy efficiency required recently are increasingly difficult
+to implement due to the von Neumann bottleneck. As a way to overcome this, Logic-in-Memory (LiM)
+technology has recently been receiving a lot of attention. In particular, since the addition function is important
+to solve high data throughput in applications such as artificial intelligence, the results of applying various
+fine-grain LiM application devices to full adder circuit design are being announced. In this paper, a Floating
+Gate Field Effect Transistor (FGFET), which has a structure similar to a floating gate memory cell transistor
+that has been widely used in the past and is highly applicable to mass production, was applied to the LiM
+application circuit design. Prior to application to circuit design, the FGFET characteristics were confirmed
+using a well-calibrated technology computer-aided design (TCAD) simulation at the 32nm technology node,
+and a compact model was developed to describe them. Afterwards, the delay and power consumption were
+evaluated with three different types of FGFET-based full adder circuits, and benchmarked with conventional
+CMOS (complementary metal-oxide-semiconductor)-based conventional full adder circuits.
+INDEX TERMS von Neumann bottleneck, logic-in-memory, floating gate field effect transistor (FGFET),
+full adder, compact modeling.
+I. INTRODUCTION
+The von Neumann architecture is a structure in which the
+CPU (Central Processor Unit) and memory are separated,
+and data transmission is performed through the system bus.
+Recently, as artificial intelligence, big data, and cloud com-
+puting applications develop, computer architecture tends to
+change from ‘Computing-intensive’ to ‘Memory-intensive’.
+At this time, it is becoming increasingly difficult to satisfy
+the requirements for such applications with the traditional
+von Neumann architecture, due to a phenomenon called
+‘Memory wall’ or ‘von Neumann bottleneck’ [1], [2]. Logic-
+in-Memory technology is attracting attention as a way to
+The associate editor coordinating the review of this manuscript and
+approving it for publication was Paolo Crippa
+ .
+overcome this problem [1], [3], [4]. The core of LiM technol-
+ogy is to increase the efficiency of data transfer by placing
+the memory and the processing unit close together without
+separating them, and it can be classified in various ways
+according to the location of processor and memory within
+the computer architecture [5]. Recently, various non-volatile
+memory technologies have been studied as LiM technologies
+are being announced [6], [7], [8], [9].
+In particular, since the addition function is important in
+applications such as artificial intelligence, the results of
+applying various existing fine-grain LiM application devices
+to full adder circuit design have been announced [10], [11],
+[12], [13], [14]. Comparison between a full adder consist-
+ing of an existing silicon CMOS transistor and a fine-grain
+LiM transistor (e.g. FeFET) shows superior circuit area and
+97778
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 License.
+For more information, see https://creativecommons.org/licenses/by-nc-nd/4.0/ VOLUME 11, 2023
+=== PAGE 2 ===
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With FGFET
+FIGURE 1. (a) Cross-section view of FGFET (b) FGFET Structure with SFET
+and VFET (c) Equivalent circuit describing FGFET device which includes
+SFET, VFET and coupling capacitance.
+energy consumption characteristics, confirming the possibil-
+ity of applying LiM transistor technology to a new computer
+architecture.
+This work intends to show the LiM technology based on
+the FGFET structure, whose integration with the CMOS FET
+is much better than the aforementioned LiM non-volatile
+devices, since it is based on the floating memory technology
+used in the existing silicon-based NAND flash memory. The
+FGFET structure is based on the device structure named
+STTM (Scalable Two Transistor Memory) and PLEDM
+(Phase-state Low Electron-number Drive Random Access
+Memory) announced by Samsung Electronics and Hitachi
+[15], [16], [17], [18], [19], [20]. The floating node that stores
+the data is placed on the gate stack of a general MOSFET,
+and the data writing function is performed by applying the
+data line voltage (VDL) and the word line voltage (VWL).
+In this work, FGFET is applied to the most scaled-down
+32nm technology node in the single gate planar MOSFET
+logic process to show LiM device characteristics, develop a
+compact model for FGFET that can be described in a circuit
+simulator, and perform various full adder circuit analyzes that
+is applied LiM technology. Two of the total three full adder
+circuits utilized the scheme of the previous thesis, and one is a
+newly proposed circuit in this work. In addition, the FGFET-
+based full adder circuit shows the result of benchmarking
+the silicon-based full adder and circuit characteristics of the
+existing 32nm technology node.
+This paper is structured as follows. Chapter 2 describes
+the FGFET device structure and compact model. Next, Chap-
+ter 3 includes the results of optimizing the voltage conditions
+TABLE 1. Values for key device parameters of FGFET in this work.
+in various full-adder circuit schemes by using the developed
+model library for FGFET, and benchmarking with the silicon
+CMOS technology. Finally, we would like to conclude and
+end in chapter 4.
+II. OPERATION AND COMPACT MODELING OF FGFET
+In this chapter, the structure and operation principle of the
+FGFET device, and compact model with well calibrated
+TCAD data as reference are explained. The FGFET structure
+is composed of vertical FET (VFET) and sense FET (SFET)
+as shown in Fig.1(b). The source of the VFET and the gate of
+the SFET meet to form a memory node, and a coupling cap
+is generated during integration into the FGFET structure.
+In this study, the 32nm planar MOSFET, which is the node
+just before the FinFET structure was applied, was selected
+as the SFET that serves as the baseline for FGFET refer-
+ring to the ITRS roadmap and Predictive Technology Model
+(PTM). In the case of VFET, the channel length (LCH) was
+set considering the aspect ratio of the fabricated FGFET,
+which has been presented in previous papers [21], [22]. The
+key design parameters of the FGFET are summarized in
+Fig.1(a) and Table 1, and the FGFET is analyzed using com-
+mercial TCAD software. Synopsys’ SentaurusTM was used as
+commercial TCAD, and drift-diffusion and tunneling mech-
+anisms are important to verify the electrical characteristics
+of FGFET. Calibration was performed with related transport
+model parameters by using measurement data of the VFET
+fabricated, and well-known target characteristics at the 32nm
+technology node. In this way, the electrical characteristics
+(I-V, C-V) of the FGFET were predicted by using the well-
+calibrated TCAD, and a compact model describing them was
+produced.
+Fig.1(c) is the equivalent circuit of FGFET, SFET and
+VFET are implemented as an industry standard BSIM4
+model, and the coupling cap component generated in the
+VOLUME 11, 2023 97779
+=== PAGE 3 ===
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With FGFET
+FIGURE 2. (a) SFET Iog plot: Id Vg@VDS = 50mV , 1V (b) VFET Iog plot:
+Id Vg@VDS = 50mV , 1V (c) SFET C-V curve (d) VFET C-V curve.
+FIGURE 3. Space charge density profile at memory node of FGFET under
+(a) storage mode (Data low) (b) storage mode (Data high) (c) read mode
+(Data low) (d) read mode (Data high).
+integration process is implemented with verilog-a language
+[23]. The VFET and SFET electrical characteristic curves
+obtained from TCAD were developed through the BSIM4
+model library, and it can be confirmed that the developed
+model library accurately describes the electrical characteris-
+tics of SFET and VFET individual devices as shown in Fig.2.
+After the development of individual SFET and VFET
+model libraries, the coupling capacitance (CVA), which varies
+depending on the voltage condition applied to the VFET, was
+modeled by using verilog-a. After that, the integrated FGFET
+model was developed by connecting CVA between SFET and
+VFET as shown in Fig.1(c). Fig.3(a)-(b) shows the charge
+FIGURE 4. (a) Transient result for data low (VDL= 0.05V (b) Transient
+result for Data High (VDL= 1V ).
+TABLE 2. Voltage conditions for FGFET operation modes.
+distribution extracted by using TCAD in the storage mode
+where the word line voltage (VWL) is -2V and the data line
+voltage (VDL) and the sense line voltage (VSL) are both 0V.
+Fig.3(c)-(d) shows the charge distribution in the read mode
+where word line voltage (VWL) is 0.5V, data line voltage
+(VDL) is 0V, and sense line voltage (VSL) is 0.9V. When data
+is low, 0.05V is applied through the data line in the write
+mode, and when data is high, 1V is applied through the data
+line in write mode. At this time, it can be confirmed through
+Fig.3 that the coupling capacitance should consider not only
+the physical cap by the dielectric layer but also the depletion
+cap that varies depending on the voltage condition.
+The operation modes of FGFET varies depending on the
+voltage applied to the word line and data line. The initialize
+mode applies 3V to the word line, does not apply voltage to
+the data line and sense line, and initializes the memory node
+voltage (VMN) to 0V before writing the data. The write mode
+applies 3V to the word line and 0V to the sense line, and
+applies 1V to the data line when writing ‘1’ and 0.05V when
+writing ‘0’. In this step, the data of VMN is determined by
+the voltage applied to the data line, and the current flowing
+through the SFET is determined, so it can function as a
+memory cell. After that, the storage mode is performed in
+which -2V is applied only to the word line while 0V is applied
+to the data line and the sense line. Through this process, the
+data of the memory node is not volatilized until the read
+mode, implementing the non-volatile function of FGFET.
+After the storage mode, the data of the memory node is read
+by applying 0.9V to the sense line and 0.5V to the word line.
+If ‘1’ is written in the write process, the SFET is turned on and
+current flows, and if ‘0’ is written, the SFET is not turned on
+and current does not flow, so the written data can be checked
+97780 VOLUME 11, 2023
+=== PAGE 4 ===
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With FGFET
+FIGURE 5. (a) Conventional 28FET full adder circuit (b) Timing graph
+(c) Logic table.
+accurately. The applied voltage conditions according to the
+operation modes are summarized in Table 2, and the transient
+characteristics of the FGFET in various operation modes can
+be described with the developed compact model as shown
+in Fig.4.
+III. FULL ADDER DESIGN BASED ON FGFET
+A. CONVENTIONAL 28FET FULL ADDER
+Full adder is a logic circuit that calculates a single digit of a
+binary number and outputs it by adding a lower digit number
+input. Fig.5(c) shows the truth table of full adder. In order to
+benchmark the FGFET-based full adder with the conventional
+28FET full adder, the performance of the conventional 28FET
+full adder was checked using the CMOS FET of the 32nm
+technology node. Note that the CMOS FET of the 32nm
+technology node has the same electrical characteristics as the
+SFET of the FGFET. The space efficiency was compared
+through the number of transistors used in the circuit con-
+figuration and layout area. The operating performance was
+compared by measuring dynamic power, static power, delay,
+and PDP. PDP is a product of delay and dynamic power.
+The conventional full adder is a circuit using a total of
+28 baseline FETs as shown in Fig.5(a). The delay was mea-
+sured as a 1-bit delay, which is the time it takes for the
+output of the upper carry number (Cout) of the full adder to
+be calculated after the lower carry number (Cin) is entered
+when ‘0’+’1’ is calculated. As a result, dynamic power was
+measured as 1.14uW, static power as 16.51nW, and delay
+as 44.55ps. In addition, PDP, which is a key indicator of
+FIGURE 6. (a) A-type full adder based on FGFET circuit (b) Timing graph
+(B = 1 stored in FGFET) (c) Timing graph (B = 0 stored in FGFET).
+the operation performance of the full adder, was measured
+at 50.79aW·s. Fig.9(a) is a conventional 28FET full adder
+layout, which was designed according to the 32nm layout
+design rules of the ITRS roadmap [24]. Two metal layers were
+used and the total area was 3.75um2.
+B. FGFET-BASED FULL-ADDER A-TYPE
+The FGFET-based full adder A-type (hereinafter referred to
+as A-type) is a full adder circuit composed of NMOS except
+for the clock transistor and inverter transistor as shown in
+Fig.6(a). A-type is a full adder circuit proposed using [13].
+Since 19 transistors (16FET + 3FGFETs) are used, which
+is 9 fewer than the conventional 28FET full adder, there
+is a clear advantage over the existing circuit in terms of
+space efficiency. The area efficiency can also be confirmed
+in Fig.9(b), which is an A-type layout. A-type uses 4 metal
+layers, and the total area is 2.46um2, which reduces 34.4%
+compared to the conventional full adder.
+A-type uses the memory node voltage as input B, and
+the current of the SFET is determined by the memory node
+voltage. At this time, 1.9V was applied to the data line when
+writing ‘1’ and 0.05V was applied to the data line when
+writing ‘0’. The word line voltage applied in the write mode
+is 3V, which is the same as the initialize mode. After writing,
+-2V was applied to the word line to proceed with the storage
+mode. Afterwards, the data written in the memory node was
+VOLUME 11, 2023 97781
+=== PAGE 5 ===
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With FGFET
+FIGURE 7. (a) B-type full adder based on FGFET circuit (b) Timing graph
+(B = 1 stored in FGFET) (c) Timing graph (B = 0 stored in FGFET).
+read by applying a read voltage of 0.5V to the word line in the
+same way as the memory operating condition. During the read
+operation, if ‘1’ is written during the write process, the SFET
+is turned on and current flows, and if ‘0’ is written, the SFET
+is not turned on and current does not flow. When the read
+voltage is applied to the FGFET, pulses corresponding to the
+input A and input Cin are applied to the other baseline FET
+gate to check the logic operation and measure the dynamic
+power, static power, delay, and PDP.
+As a result, the dynamic power showed the same per-
+formance as the conventional 28FET full adder at 1.14uW,
+although the number of elements was reduced.
+This is the effect of leakage current that occurs when the
+transistor connected to the !Cout node is not immediately
+turned off while the current flow is instantaneously changed
+by the operation of the clock transistor. The static power is
+13.64nW, which reduces the number of elements constituting
+the entire circuit, and reduces the leakage current due to the
+GIDL phenomenon by the Si3N4 barrier inserted between the
+source/drain and channel. Therefore, it decreased to 82.62%
+level compared to the conventional 28FET full adder. Also,
+the delay was measured as 43.54ps and slightly decreased
+to 97.73% of the existing 28FET full adder. As a result, the
+PDP is slightly reduced to 49.64aW·s, which is 97.73% of
+the conventional 28FET full adder, and has an advantage in
+terms of operating performance compared to the conventional
+28FET full adder.
+FIGURE 8. (a) C-type full adder based on FGFET circuit (b) Timing graph
+(B = 1 stored in FGFET) (c) Timing graph (B = 0 stored in FGFET).
+C. FGFET-BASED FULL-ADDER B-TYPE
+In the case of FGFET-based full adder B-type (hereinafter
+referred to as B-type), the FeFET full adder of the array
+structure proposed in the Evelyn T.Breyer paper is a cir-
+cuit implemented with FGFET as shown in Fig.7(a). [14] A
+total of 20 transistors (13FET+7FGFET) are used, includ-
+ing 2 pull-up clock transistors connected to the bit line and
+4 inverter transistors for Sum and Cout outputs, which is
+8 fewer than the conventional 28FET full adder. Also, B-type
+differs from A-type in that it is a structure in which Sum and
+Cout are independently operated. Fig.9(c) is a B-type layout
+where 4 metal layers are used and the total area is 2.24um2,
+reducing 40.3% compared to the conventional full adder.
+The biggest feature of the B-type operation principle is that
+input A and input B are applied as read voltage and write
+voltage of FGFET, respectively, and FGFET operates with
+AND gate as shown in Fig.7(b). That is, ‘1’ is output only
+when the read voltage, which is the voltage applied to the
+word line in read mode, and the write voltage, which is the
+voltage applied to the data line in write mode, are both ‘1’.
+The read voltage was set as input A, and 1.8V was applied for
+‘1’ and 0V for ‘0’ through the word line in read mode. The
+write voltage was set to input B as in A-type, and 1.8V for ‘1’
+and 0.1V for ‘0’ were applied through the data line in write
+mode. Afterwards, since the current should flow through the
+97782 VOLUME 11, 2023
+=== PAGE 6 ===
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With FGFET
+FIGURE 9. (a) Conventional 28FET full adder layout (b) FGFET-based full
+adder A-type layout (c) FGFET-based full adder B-type layout
+(d) FGFET-based full adder C-type layout.
+SFET of the FGFET only when both the read voltage and the
+write voltage are ‘1’, the threshold voltage value was shifted
+0.9V by using the DELVT0 parameter value.
+After going through initialize, write, and storage modes in
+the same way as A-type, pulses were applied to the baseline
+FET in read mode to compare static power, dynamic power,
+delay, and PDP. First, the dynamic power was measured at
+1.08uW, which was reduced to 94.74% compared to the con-
+ventional 28FET full adder. This is due to the reduced number
+of circuit components compared to the conventional 28FET
+full adder. However, unlike the A-type, the B-type has clearly
+improved dynamic power performance because the Sum and
+Cout circuits are configured independently, so leakage due to
+switching does not occur. Static power is measured as 5.40nW
+due to the reduced GIDL leakage current by the Si3N4 barrier
+and the reduced number of circuit components, similar to
+the A-type. This is greatly reduced to the level of 32.53%
+compared to the conventional 28FET full adder. In the case
+of delay, due to the simple circuit configuration of the array
+structure, it is measured as 41.25ps and reduced to 92.59%
+compared to the conventional 28FET full adder. As a result,
+the PDP was reduced to 44.55aW·s, which is 87.71% com-
+pared to the existing conventional 28FET full adder, showing
+a clear advantage in terms of operating performance.
+D. FGFET-BASED FULL-ADDER C-TYPE
+The FGFET-based Full Adder C-type (hereafter C-type) pro-
+posed for the first time in this work does not move the
+threshold voltage unlike the B-type. Also, in C-type, FGFET
+is characterized by operating as an OR gate as shown in
+Fig.8(b). Therefore, in the case of C-type, if the read voltage
+or write voltage is ‘1’, output comes out ‘1’. Also, unlike
+B-type, there are cases where input A is used as the read
+voltage of FGFET and case where it is used as baseline FET
+gate voltage. The C-type circuit is shown in Fig.8(a), and
+the total number of transistors is 21 (15FET + 6FGFET),
+TABLE 3. Performance and power of full adders.
+including 2 pull-up clock transistors connected to bit lines and
+4 inverter transistors for Sum and Cout. The C-type is 7 fewer
+than the conventional 28FET full adder. Also Fig.9(d) is a
+C-type layout, 4 metal layers were used, and the total area
+was 2.53um2, which was reduced by 32.5% compared to the
+conventional full adder, confirming the efficiency in terms of
+area.
+As for the voltage condition, in the case of input A applied
+as a read voltage through the word line in FGFET read mode,
+1.2V is applied for ‘1’ and 0V for ‘0’. In the case of input
+A applied to the baseline FET, 1V was applied for ‘1’ and
+0V for ‘0’, the same as other baseline FET gate voltages. The
+write voltage corresponding to input B was 1.85V when it
+was ‘1’ and 0.85V when it was ‘0’ in write mode. Afterwards,
+static power, dynamic power, delay, and PDP were measured
+as the same way as A-type and B-type.
+As with the B-type, the dynamic power was reduced to
+0.93uW, 81.58% of the conventional 28FET full adder, due
+to the decrease in the number of circuit elements. Similar
+to the FGFET-based full adder mentioned earlier, the static
+power dropped significantly to 5.55 nW, a 33.62% level, due
+to the reduced number and reduced GIDL leakage current
+applied to the barrier. In the case of delay, as in the B-type,
+due to the circuit configuration of the array structure, 16.44 ps
+was significantly reduced to 36.90% compared to the conven-
+tional 28FET full adder. As a result, the PDP expressed as the
+product of dynamic power and delay was 15.29aW·s, which
+was reduced by 30.10% compared to the conventional 28FET
+full adder.
+IV. CONCLUSION
+In this work, the FGFET device that can be used for next-
+generation LiM applications is introduced and applied to the
+32nm planar MOSFET technology node for the first time to
+show the LiM full adder circuit design characteristics. To this
+end, the structure and operating principle of the FGFET are
+explained, and the performance of three different types of
+full adder circuits based on FGFET is verified by using the
+FGFET compact model.
+VOLUME 11, 2023 97783
+=== PAGE 7 ===
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With FGFET
+All three full adders show a great advantage compared
+to the conventional 28FET full adder in terms of static
+power due to the Si3N4 barrier structure inserted between
+source/drain and channel. In addition, as the number of
+elements constituting the circuit decreased, not only the
+advantage in terms of space efficiency, but also improved
+indicators in PDP, an indicator related to operating perfor-
+mance. As such, FGFET, which has been confirmed to be
+applicable to LiM application circuits, has a structure similar
+to silicon-based floating gate memory cell transistors that
+have been widely used in the past, so it is very likely to be
+applied to mass production. Therefore, it is a device technol-
+ogy that is highly likely to be applied to mass production in
+the industry in the future.
+ACKNOWLEDGMENT
+(Sueyeon Kim and Insoo Choi contributed equally to this
+work.)
+REFERENCES
+[1] X. Huang, C. Liu, Y.-G. Jiang, and P. Zhou, ‘‘In-memory computing
+to break the memory wall,’’ Chin. Phys. B, vol. 29, no. 7, Jul. 2020,
+Art. no. 078504.
+[2] W. A. Wulf and S. A. McKee, ‘‘Hitting the memory wall: Implications
+of the obvious,’’ ACM SIGARCH Comput. Archit. News, vol. 23, no. 1,
+pp. 20–24, Mar. 1995.
+[3] O. Mutlu, S. Ghose, J. Gómez-Luna, and R. Ausavarungnirun, ‘‘Processing
+data where it makes sense: Enabling in-memory computation,’’ Micropro-
+cessors Microsyst., vol. 67, pp. 28–41, Jun. 2019.
+[4] A. Sebastian, M. L. Gallo, R. Khaddam-Aljameh, and E. Eleftheriou,
+‘‘Memory devices and applications for in-memory computing,’’ Nature
+Nanotechnol., vol. 15, no. 7, pp. 529–544, Jul. 2020.
+[5] I. O’Connor, M. Cantan, C. Marchand, B. Vilquin, S. Slesazeck,
+E. T. Breyer, H. Mulaosmanovic, T. Mikolajick, B. Giraud, J.-P. Noël,
+A. Ionescu, and I. Stolichnov, ‘‘Prospects for energy-efficient edge
+computing with integrated HfO2-based ferroelectric devices,’’ in Proc.
+IFIP/IEEE Int. Conf. Very Large Scale Integr. (VLSI-SoC), Oct. 2018,
+pp. 180–183.
+[6] N. Talati, R. Ben-Hur, N. Wald, A. Haj-Ali, J. Reuben, and S. Kvatinsky,
+‘‘mMPU—A real processing-in-memory architecture to combat the von
+Neumann bottleneck,’’ in Applications of Emerging Memory Technology.
+Singapore: Springer, 2020, pp. 191–213.
+[7] D. Ielmini and H.-S.-P. Wong, ‘‘In-memory computing with resis-
+tive switching devices,’’ Nature Electron., vol. 1, no. 6, pp. 333–343,
+Jun. 2018.
+[8] X. Chen, X. Yin, M. Niemier, and X. S. Hu, ‘‘Design and optimization of
+FeFET-based crossbars for binary convolution neural networks,’’ in Proc.
+Design, Autom. Test Eur. Conf. Exhib. (DATE), Mar. 2018, pp. 1205–1210.
+[9] Y. Zhang, L. Xu, K. Yang, Q. Dong, S. Jeloka, D. Blaauw, and D. Sylvester,
+‘‘Recryptor: A reconfigurable in-memory cryptographic cortex-M0 pro-
+cessor for IoT,’’ in Proc. Symp. VLSI Circuits, Jun. 2017, pp. C264–C265.
+[10] T. Zanotti, F. M. Puglisi, and P. Pavan, ‘‘Smart logic-in-memory
+architecture for low-power non-von Neumann computing,’’
+IEEE J. Electron Devices Soc., vol. 8, pp. 757–764, 2020, doi:
+10.1109/JEDS.2020.2987402.
+[11] P. Barla, V. K. Joshi, and S. Bhat, ‘‘Design and evaluation of a self
+write-terminated hybrid MTJ/CMOS full adder based on LIM structure,’’
+J. Circuits, Syst. Comput., vol. 31, no. 8, May 2022, Art. no. 2250146.
+[12] C. Marchand, I. O’Connor, M. Cantan, E. T. Breyer, S. Slesazeck, and
+T. Mikolajick, ‘‘FeFET based logic-in-memory: An overview,’’ in Proc.
+16th Int. Conf. Design Technol. Integr. Syst. Nanosc. Era (DTIS), Jun. 2021,
+pp. 1–6, doi: 10.1109/DTIS53253.2021.9505078.
+[13] X. Yin, A. Aziz, J. Nahas, S. Datta, S. Gupta, M. Niemier, and X. Sharon
+Hu, ‘‘Exploiting ferroelectric FETs for low-power non-volatile logic-in-
+memory circuits,’’ in Proc. IEEE/ACM Int. Conf. Comput.-Aided Design
+(ICCAD), Nov. 2016, pp. 1–8, doi: 10.1145/2966986.2967037.
+[14] E. T. Breyer, H. Mulaosmanovic, J. Trommer, T. Melde, S. Dunkel,
+M. Trentzsch, S. Beyer, S. Slesazeck, and T. Mikolajick, ‘‘Compact
+FeFET circuit building blocks for fast and efficient nonvolatile logic-in-
+memory,’’ IEEE J. Electron Devices Soc., vol. 8, pp. 748–756, 2020, doi:
+10.1109/JEDS.2020.2987084.
+[15] H. Mizuta, M. Wagner, and K. Nakazato, ‘‘The role of tunnel barriers
+in phase-state low electron-number drive transistors (PLEDTRs),’’ IEEE
+Trans. Electron Devices, vol. 48, no. 6, pp. 1103–1108, Jun. 2001.
+[16] K.-D. Kim, K.-H. Lee, S.-J. Baik, J.-H. Lee, T.-K. Kim, and J.-T. Kong,
+‘‘Characterization of multi-barrier tunneling diodes and vertical transistors
+using 2-D device simulation,’’ in Proc. Int. Conf. Simulation Semiconduc-
+tor Processes Devices, 2002, pp. 167–170.
+[17] S. J. Ahn, G. H. Koh, K. W. Kwon, S. J. Baik, G. T. Jung, Y. N. Hwang,
+H. S. Jeong, and K. Kim, ‘‘Highly scalable and CMOS-compatible STTM
+cell technology,’’ in IEDM Tech. Dig., Dec. 2003, pp. 267–270.
+[18] S. J. Baik, Z. Huo, S.-H. Lim, I.-S. Yeo, S. Choi, U.-I. Chung, and
+J. T. Moon, ‘‘STTM-promising nanoelectronic DRAM device,’’ in Proc.
+4th IEEE Conf. Nanotechnol., Aug. 2004, pp. 45–46.
+[19] K. Nakazato, K. Itoh, H. Ahmed, H. Mizuta, T. Kisu, M. Kato, and
+T. Sakata, ‘‘Phase-state low electron-number drive random access memory
+(PLEDM),’’ in IEEE Int. Solid-State Circuits Conf. (ISSCC) Dig. Tech.
+Papers, Feb. 2000, pp. 132–133.
+[20] S. Kang, W. Y. Cho, B.-G. Choi, B. Cho, H.-R. Oh, H.-J. Kim, S.-J. Baik,
+D. Kim, C.-K. Kwak, and H.-G. Byun, ‘‘Scalable two transistor memory
+(STTM) for mobile embedded applications with 80nm technology,’’ in
+Proc. ISOCC, 2004, pp. 159–162.
+[21] W. Zhao and Y. Cao, ‘‘Predictive technology model for nano-CMOS design
+exploration,’’ ACM J. Emerg. Technol. Comput. Syst., vol. 3, no. 1, p. 1,
+Apr. 2007.
+[22] The International Technology Roadmap for Semiconductors, ITRS,
+London, U.K., 2005.
+[23] BSIM Group. (2011). BSIM 4.7 Manual. [Online]. Available:
+https://berkeley.edu
+[24] P. Packan et al., ‘‘High performance 32 nm logic technology featuring
+2nd generation high-k+ metal gate transistors,’’ in IEDM Tech. Dig.,
+Dec. 2009, pp. 1–4.
+SUEYEON KIM received the B.S. and M.S.
+degrees in electrical and electronics engineering
+from Konkuk University, Seoul, South Korea, in
+2020 and 2023, respectively. Her research interests
+include logic-in-memory device and design tech-
+nology co-optimization.
+INSOO CHOI received the B.S. degree in elec-
+tronic engineering from Konkuk University, Seoul,
+South Korea, in 2023. From 2021 to 2023, he was a
+Research Assistant with the Device Research Lab-
+oratory, Konkuk University. His research interest
+includes the development of device.
+SANGKI CHO received the B.S. degree in elec-
+trical and electronic engineering from Konkuk
+University, Seoul, Republic of Korea, in 2023,
+where he is currently pursuing the M.S. degree in
+electrical and electronics engineering. His research
+interests include the next generation technology of
+semiconductor device and compact modeling.
+97784 VOLUME 11, 2023
+=== PAGE 8 ===
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With FGFET
+MYOUNGGON KANG (Senior Member, IEEE)
+received the B.S. degree (Hons.) in electron-
+ics and information engineering from Chonbuk
+National University, Jeonju, in 2003, and the M.S.
+and Ph.D. degrees in electrical engineering from
+Seoul National University, Seoul, South Korea, in
+2005 and 2012, respectively. He is currently an
+Associate Professor with the Department of Elec-
+tronics Engineering, Korea National University of
+Transportation, Chungju, South Korea.
+SEUNGJAE BAIK received the B.S., M.S., and
+Ph.D. degrees in electrical engineering from the
+Korea Advanced Institute of Science and Tech-
+nology (KAIST), Daejeon, South Korea, in 1994,
+1996, and 2001, respectively. From 2001 to 2009,
+he was with Samsung Electronics Company Ltd.,
+Yongin, South Korea, where he contributed to
+novel Si devices, high-density flash memory
+devices, and charge trap flash memory devices,
+as a Senior Engineer and a Principal Engineer.
+From 2009 to 2012, he was with KAIST as a Research Professor, where
+he contributed to thin film Si solar cells, quantum dot solar cells, new
+memory materials, and devices. From 2012 to 2022, he was with Hankyong
+National University, Anseong-si, South Korea, as an Associate Professor.
+Since 2023, he has been a Master Engineer with the Samsung Research
+and Development Center, South Korea. His current research interests include
+charge trap memory devices, phase change memory devices, and plasma
+epitaxial growth.
+CHANGHO RA received the B.S. and M.S.
+degrees in nano engineering from Sungkyunkwan
+University, Suwon, South Korea, in 2009 and
+2018, respectively. From 2020 to 2023, he worked
+at Konkuk University Device Research lab, Seoul,
+South Korea. Since 2023, he has been joined
+Sungkyunkwan University, Device Research lab.
+His research interest includes design technology
+co-optimization.
+JONGWOOK JEON received the B.S. degree in
+electrical engineering from Sungkyunkwan Uni-
+versity, South Korea, in 2004, and the Ph.D. degree
+in electrical engineering from Seoul National Uni-
+versity, Seoul, South Korea, in 2009. He was a
+Senior and Principal Engineer with the Samsung
+Research and Development Center, South Korea,
+from 2009 to 2017. From 2017 to 2023, he was
+an Assistant Professor and an Associate Professor
+with the Department of Electrical Engineering,
+Konkuk University, South Korea. Since 2023, he has been an Asso-
+ciate Professor with the School of Electronic and Electrical Engineering,
+Sungkyunkwan University. His research interest includes the design-
+technology co-optimization (DTCO) of next generation technology of semi-
+conductor device.
+VOLUME 11, 2023 97785

@@ -1,0 +1,113 @@
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With
+
+--- BLOCK ---
+
+All three full adders sho w a great adv antage compared to the con v entional
+
+--- BLOCK ---
+
+SU E YE ON KI M recei v ed the B.S. and M.S. de grees in electrical and electronics engineering from K onkuk Uni v ersity , Seoul, South K orea, in 2020 and 2023, respecti v ely . Her research interests include logic-in-memory de vice and design tech- nology co-optimization.
+
+--- BLOCK ---
+
+I NS OO CHOI recei v ed the B.S. de gree in elec- tronic engineering from K onkuk Uni v ersity , Seoul, South K orea, in 2023. From 2021 to 2023, he w as a Research Assistant with the De vice Research Lab- oratory , K onkuk Uni v ersity . His research interest includes the de v elopment of de vice.
+
+--- BLOCK ---
+
+S ANGKI CHO recei v ed the B.S. de gree in elec- trical and electronic engineering from K onkuk Uni v ersity , Seoul, Republic of K orea, in 2023, where he is currently pursuing the M.S. de gree in electrical and electronics engineering. His research interests include the ne xt generation technology of semiconductor de vice and compact modeling. 97784 VOLUME 11, 2023
+
+--- BLOCK ---
+
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With
+
+--- BLOCK ---
+
+FIGURE 2. \(a\ SF E T Iog plot: I d V g @ V DS D 5 0 mV ; 1 V \(b\ VF E T Iog plot: I d V g @ V DS D 5 0 mV ; 1 V \(c\ SF E T C-V curve \(d\ VF E T C-V curve.
+
+--- BLOCK ---
+
+FIGURE 3. Space charge density profile at memory node of FGF E T under \(a\ storage mode \(Data low\ \(b\ storage mode \(Data high\ \(c\ read mode \(Data low\ \(d\ read mode \(Data high\ inte gration process is implemented with v erilog-a language [23] . The
+
+--- BLOCK ---
+
+FIGURE 4. \(a\ T ransient result for data low \( V DL D 0 : 05 V \(b\ T ransient result for Data High \( V DL D 1 V \ TABLE 2. V oltage conditions for FGF E T operation modes.
+
+--- BLOCK ---
+
+distrib ution e xtracted by using TCAD in the storage mode where the w ord line v oltage \(V WL \ is -2V and the data line v oltage \(V DL \ and the sense line v oltage \(V SL \ are both 0V . Fig. 3\(c\ - \(d\ sho ws the char ge distrib ution in the read mode where w ord line v oltage \(V WL \ is 0.5V , data line v oltage \(V DL \ is 0V , and sense line v oltage \(V SL \ is 0.9V . When data is lo w , 0.05V is applied through the data line in the write mode, and when data is high, 1V is applied through the data line in write mode. At this time, it can be con\034rmed through Fig. 3 that the coupling capacitance should consider not only the ph ysical cap b y the dielectric layer b ut also the depletion cap that v aries depending on the v oltage condition. The operation modes of
+
+--- BLOCK ---
+
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With
+
+--- BLOCK ---
+
+FIGURE 5. \(a\ Conventional 2 8F E T full adder circuit \(b\ T iming graph \(c\ Log ic table. accurately . The applied v oltage conditions according to the operation modes are summarized in T able 2 , and the transient characteristics of the
+
+--- BLOCK ---
+
+FIGURE 6. \(a\ A-type full adder based on FGF E T circuit \(b\ T iming graph \(B D 1 stored in FGF E T\ \(c\ T iming graph \(B D 0 stored in FGF E T\ the operation performance of the full adder , w as measured at 50.79aW \001 s. Fig. 9\(a\ is a con v entional
+
+--- BLOCK ---
+
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With
+
+--- BLOCK ---
+
+FIGURE 7. \(a\ B-type full adder based on FGF E T circuit \(b\ T iming graph \(B D 1 stored in FGF E T\ \(c\ T iming graph \(B D 0 stored in FGF E T\ read by applying a read v oltage of 0.5V to the w ord line in the same w ay as the memory operating condition. During the read operation, if `1' is written during the write process, the
+
+--- BLOCK ---
+
+FIGURE 8. \(a\ C-type full adder based on FGF E T circuit \(b\ T iming graph \(B D 1 stored in FGF E T\ \(c\ T iming graph \(B D 0 stored in FGF E T\ C. F G
+
+--- BLOCK ---
+
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With
+
+--- BLOCK ---
+
+FIGURE 9. \(a\ Conventional 2 8F E T full adder layout \(b\ FGF E T -based full adder A-type layout \(c\ FGF E T -based full adder B-type layout \(d\ FGF E T -based full adder C-type layout.
+
+--- BLOCK ---
+
+including 2 pull-up clock transistors connected to bit lines and 4 in v erter transistors for Sum and Cout. The C-type is 7 fe wer than the con v entional
+
+--- BLOCK ---
+
+Received 21 June 2023, accepted 28 July 2023, date of publication 31 August 2023, date of current version 13 September 2023. Digital Object Identifier 1 0.1 1 09/ACCESS.2 0 23.33 1 0823
+
+--- BLOCK ---
+
+Analysis of Logic-in-Memory Full Adder Circuit With Floating Gate Field Effect Transistor
+
+--- BLOCK ---
+
+1 , I NS OO CHOI 1 , S ANGKI CHO 1 , M Y OU NG G ON K ANG
+
+--- BLOCK ---
+
+S. Kim et al.: Analysis of Logic-in-Memory Full Adder Circuit With
+
+--- BLOCK ---
+
+M Y OU NG G ON K ANG \(Senior Member , IEEE\ recei v ed the B.S. de gree \(Hons.\ in electron- ics and information engineering from Chonb uk National Uni v ersity , Jeonju, in 2003, and the M.S. and Ph.D. de grees in electrical engineering from Seoul National Uni v ersity , Seoul, South K orea, in 2005 and 2012, respecti v ely . He is currently an Associate Professor with the Department of Elec- tronics Engineering, K orea National Uni v ersity of T ransportation, Chungju, South K orea.
+
+--- BLOCK ---
+
+SEU NGJ AE B AI K recei v ed the B.S., M.S., and Ph.D. de grees in electrical engineering from the K orea Adv anced Institute of Science and T ech- nology \(KAIST\ Daejeon, South K orea, in 1994, 1996, and 2001, respecti v ely . From 2001 to 2009, he w as with Samsung Electronics Compan y Ltd., Y ongin, South K orea, where he contrib uted to no v el Si de vices, high-density \035ash memory de vices, and char ge trap \035ash memory de vices, as a Senior Engineer and a Principal Engineer . From 2009 to 2012, he w as with KAIST as a Research Professor , where he contrib uted to thin \034lm Si solar cells, quantum dot solar cells, ne w memory materials, and de vices. From 2012 to 2022, he w as with Hank yong National Uni v ersity , Anseong-si, South K orea, as an Associate Professor . Since 2023, he has been a Master Engineer with the Samsung Research and De v elopment Center , South K orea. His current research interests include char ge trap memory de vices, phase change memory de vices, and plasma epitaxial gro wth.
+
+--- BLOCK ---
+
+CHANGHO R A recei v ed the B.S. and M.S. de grees in nano engineering from Sungk yunkw an Uni v ersity , Suw on, South K orea, in 2009 and 2018, respecti v ely . From 2020 to 2023, he w ork ed at K onkuk Uni v ersity De vice Research lab, Seoul, South K orea. Since 2023, he has been joined Sungk yunkw an Uni v ersity , De vice Research lab . His research interest includes design technology co-optimization.
+
+--- BLOCK ---
+
+JONGW OOK J E ON recei v ed the B.S. de gree in electrical engineering from Sungk yunkw an Uni- v ersity , South K orea, in 2004, and the Ph.D. de gree in electrical engineering from Seoul National Uni- v ersity , Seoul, South K orea, in 2009. He w as a Senior and Principal Engineer with the Samsung Research and De v elopment Center , South K orea, from 2009 to 2017. From 2017 to 2023, he w as an Assistant Professor and an Associate Professor with the Department of Electrical Engineering, K onkuk Uni v ersity , South K orea. Since 2023, he has been an Asso- ciate Professor with the School of Electronic and Electrical Engineering, Sungk yunkw an Uni v ersity . His research interest includes the design- technology co-optimization \(DTCO\ of ne xt generation technology of semi- conductor de vice.
+
+--- BLOCK ---
+
+VOLUME 11, 2023 97785
+
+--- BLOCK ---
+
+INDEX TERMS v on Neumann bottleneck, logic-in-memory , \035oating g ate \034eld ef fect transistor
