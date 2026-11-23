@@ -1,11 +1,10 @@
 * Figure 5(a) - conventional 28-FET CMOS full adder
 * Table III comparison, Kim et al., DOI 10.1109/ACCESS.2023.3310823
-.include cmos_32nm.pm
 * Published area reference: 3.75 um^2 (Table III).
 * Physical area of this fitted circuit requires a cell layout.
 * Fitted widths, output loads, and 30 nm Sum PMOS drawn length.
 * Dynamic power uses the 0-16 ns supply average minus settled leakage.
-.param VSUP=0.9 VAB=0.9 EDGE=10p LG=32n
+.param VSUP=0.9 VAB=1 EDGE=10p LG=32n
 .param WN=64n WP=128n WNI=80n WPI_SUM=110.665n WPI_COUT=40n
 .param CLOAD_SUM=1.108f CLOAD_COUT=1.4015f
 .temp 27
@@ -23,44 +22,15 @@ VBH bh 0 PULSE(0 {VAB}  {T0+2*HOLD} {EDGE} {EDGE} {2*HOLD-EDGE} {4*HOLD})
 VCH ch 0 PULSE(0 {VSUP} {T0+HOLD}   {EDGE} {EDGE} {HOLD-EDGE}   {2*HOLD})
 
 * Inverted carry
-MCP1 cp_par a vdd vdd pmos_32nm L={LG} W={WP}
-MCP2 cp_par b vdd vdd pmos_32nm L={LG} W={WP}
-MCP3 cbar cin cp_par vdd pmos_32nm L={LG} W={WP}
-MCP4 cp_ab b vdd vdd pmos_32nm L={LG} W={WP}
-MCP5 cbar a cp_ab vdd pmos_32nm L={LG} W={WP}
-MCN1 cbar cin cn_par 0 nmos_32nm L={LG} W={WN}
-MCN2 cn_par a 0 0 nmos_32nm L={LG} W={WN}
-MCN3 cn_par b 0 0 nmos_32nm L={LG} W={WN}
-MCN4 cbar a cn_ab 0 nmos_32nm L={LG} W={WN}
-MCN5 cn_ab b 0 0 nmos_32nm L={LG} W={WN}
 
 * Inverted sum
-MSP1 sp_par a vdd vdd pmos_32nm L={LG} W={WP}
-MSP2 sp_par b vdd vdd pmos_32nm L={LG} W={WP}
-MSP3 sp_par cin vdd vdd pmos_32nm L={LG} W={WP}
-MSP4 sbar cbar sp_par vdd pmos_32nm L={LG} W={WP}
-MSP5 sp_c cin vdd vdd pmos_32nm L={LG} W={WP}
-MSP6 sp_cb b sp_c vdd pmos_32nm L={LG} W={WP}
-MSP7 sbar a sp_cb vdd pmos_32nm L={LG} W={WP}
-MSN1 sbar cbar sn_par 0 nmos_32nm L={LG} W={WN}
-MSN2 sn_par a 0 0 nmos_32nm L={LG} W={WN}
-MSN3 sn_par b 0 0 nmos_32nm L={LG} W={WN}
-MSN4 sn_par cin 0 0 nmos_32nm L={LG} W={WN}
-MSN5 sbar cin sn_c 0 nmos_32nm L={LG} W={WN}
-MSN6 sn_c b sn_cb 0 nmos_32nm L={LG} W={WN}
-MSN7 sn_cb a 0 0 nmos_32nm L={LG} W={WN}
 
 * Output inverters and external lumped loads
-MCOP cout cbar vdd vdd pmos_32nm L={LG} W={WPI_COUT}
-MCON cout cbar 0 0 nmos_32nm L={LG} W={WNI}
-MSOP sum sbar vdd vdd pmos_32nm L=30n W={WPI_SUM}
-MSON sum sbar 0 0 nmos_32nm L={LG} W={WNI}
 CCOUT cout 0 {CLOAD_COUT}
 CSUM sum 0 {CLOAD_SUM}
 
 .options plotwinsize=0 reltol=1e-4 gmin=1e-15 numdgt=8
 .save V(a) V(b) V(cin) V(sum) V(cout) V(vdd) I(VSUPPLY)
-.tran 0 {T0+7.99*HOLD} 0 100p
 .meas tran Cin_high_V MAX V(cin) FROM=0 TO=8n
 .meas tran Delay_s TRIG V(cin) VAL={VSUP/2} TD=4.5n RISE=1
 + TARG V(cout) VAL={VSUP/2} TD=4.5n RISE=1
@@ -90,4 +60,3 @@ CSUM sum 0 {CLOAD_SUM}
 .meas tran Supply_W AVG (-V(vdd)*I(VSUPPLY)) FROM=0 TO=16n
 .meas tran Dynamic_uW PARAM Supply_W*1e6-Static_nW/1000
 .meas tran PDP_aWs PARAM Dynamic_uW*Delay_ps
-.end

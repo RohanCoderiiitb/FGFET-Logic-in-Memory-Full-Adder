@@ -83,8 +83,10 @@
     "type": "Conventional 28-FET",
     "transistor_count": 28,
     "cin_high_V": 0.9,
-    "t_plh_ps": 44.7585,
+    "t_plh_ps": 44.5589,
     "p_static_nW": 16.5105,
+    "p_dyn_uW": 1.13771,
+    "pdp_aWs": 50.6952,
     "logic_ok": true,
     "truth_table": {
       "000": true,

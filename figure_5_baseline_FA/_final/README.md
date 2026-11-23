@@ -4,7 +4,8 @@ Open `full_adder_28fet.asc` in LTspice for the editable conventional adder,
 or run `full_adder_28fet.cir` directly. Extract the entire folder first.
 Both use the supplied `models/cmos_32nm.pm`. The schematic also reads
 `fig5a_testbench.inc`. Its first 16 ns reproduce the logic sequence.
-The subsequent long input holds measure leakage.
+The subsequent long input holds measure leakage. The calibrated Table III
+run uses 1.0 V highs on A and B, with Cin and VDD at 0.9 V.
 
 Run `python3 scripts/verify_28fet.py` from this folder to regenerate Figure 5
 results using Python and NumPy. On macOS the script detects LTspice in

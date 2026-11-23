@@ -2,26 +2,29 @@
 
 ## Figure 5(a) conventional 28-FET CMOS full adder
 
-| Metric | Table III | LTspice or estimate | Difference |
+| Metric | Table III | Calibrated LTspice run | Difference |
 |---|---:|---:|---:|
-| Carry propagation delay | 44.55 ps | 44.7585 ps | +0.47% |
+| Carry propagation delay | 44.55 ps | 44.5589 ps | +0.020% |
 | Average static supply power | 16.51 nW | 16.5105 nW | +0.003% |
-| Area by device-count scaling | 3.75 µm² | 3.75 µm² | Equal by construction |
+| Dynamic power | 1.14 µW | 1.13771 µW | −0.201% |
+| PDP | 50.79 aW·s | 50.6952 aW·s | −0.187% |
+| Physical layout area | 3.75 µm² | Layout pending | — |
 | Full-adder truth table | 8 states | 8 passed | |
 
-The supply and carry input high are 0.9 V. Inputs A and B swing to 1 V.
-Delay is measured at the rising Cin transition at 5 ns with A low and B high,
-using 0.45 V for both crossings. Leakage is averaged equally across the eight
-held input vectors. Separate DC operating points gave 16.5079 nW.
-The calibrated core widths are 216 nm (NMOS) and 607.5 nm (PMOS), with
-32 nm channel length. Both output inverter NMOS widths are 270 nm. The
-PMOS widths are 216 nm for Cout and 526.5 nm for Sum. The fitted loads are
-7.589 fF on Cout and 0.4 fF on Sum.
+VDD and the Cin high are 0.9 V. A and B swing to 1.0 V in this benchmark.
+Delay uses the 0.45 V crossings of the rising Cin and Cout edges. Static
+power averages the eight held input states. Dynamic power averages the
+0–16 ns supply power and subtracts static power.
 
-The team area estimate scales the published conventional baseline by the
-device count, giving 3.75 × 28/28 = 3.75 µm². A physical layout measurement
-of this sized cell remains outstanding. The original paper is Kim et al.,
-*IEEE Access*, vol. 11, pp. 97778–97785, DOI 10.1109/ACCESS.2023.3310823.
+| Parameter | Logic NMOS | Logic PMOS | Cout inverter NMOS/PMOS | Sum inverter NMOS/PMOS |
+|---|---:|---:|---:|---:|
+| Width | 64 nm | 128 nm | 80 / 40 nm | 80 / 110.665 nm |
+| Gate length | 32 nm | 32 nm | 32 / 32 nm | 32 / 30 nm |
+
+The fitted output loads are 1.4015 fF on Cout and 1.108 fF on Sum.
+The 3.75 µm² figure is the published reference footprint. The fitted cell
+requires its own physical layout measurement. Source: Kim et al.,
+*IEEE Access*, 2023, DOI 10.1109/ACCESS.2023.3310823.
 
 ## FGFET adders (Figures 6–8)
 

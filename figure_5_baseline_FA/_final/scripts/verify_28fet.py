@@ -41,7 +41,8 @@ def verify():
         delay, static = measure("delay_ps"), measure("static_nw")
         result = dict(type="Conventional 28-FET", transistor_count=devices,
                       cin_high_V=measure("cin_high_v"), t_plh_ps=delay,
-                      p_static_nW=static, logic_ok=all(states.values()), truth_table=states,
+                      p_static_nW=static, p_dyn_uW=measure("dynamic_uw"),
+                      pdp_aWs=measure("pdp_aws"), logic_ok=all(states.values()), truth_table=states,
                       estimated_area_um2=3.75*devices/28,
                       area_method="Device count scaled to paper baseline (3.75 um^2 for 28 devices)")
         if not (devices == 28 and result["logic_ok"] and abs(result["cin_high_V"]-.9)<1e-6
