@@ -1,0 +1,40 @@
+LTspice 17.2.4 for MacOS
+Circuit: * Figure 5(a) - conventional 28-FET CMOS full adder
+Start Time: Mon Nov 23 11:59:13 2026
+solver = Normal
+Maximum thread count: 1
+tnom = 27
+temp = 27
+method = modified trap
+gmin = 1e-15
+reltol = 0.0001
+Warning: toxe, toxp and dtox all given and toxe != toxp + dtox; dtox ignored.
+Direct Newton iteration for .op point succeeded.
+
+cin_high_v: MAX(v(cin))=0.9 FROM 0 TO 8e-09
+delay_s=4.45589e-11 FROM 5e-09 TO 5.04456e-09
+delay_ps: delay_s*1e12=44.5589
+p000: AVG(-v(vdd)*i(vsupply))=2.91898e-08 FROM 1.617e-06 TO 1.917e-06
+p001: AVG(-v(vdd)*i(vsupply))=3.55731e-09 FROM 3.617e-06 TO 3.917e-06
+p100: AVG(-v(vdd)*i(vsupply))=3.51591e-09 FROM 9.617e-06 TO 9.917e-06
+p101: AVG(-v(vdd)*i(vsupply))=3.12016e-08 FROM 1.1617e-05 TO 1.1917e-05
+p010: AVG(-v(vdd)*i(vsupply))=3.45283e-09 FROM 5.617e-06 TO 5.917e-06
+p011: AVG(-v(vdd)*i(vsupply))=3.11006e-08 FROM 7.617e-06 TO 7.917e-06
+p110: AVG(-v(vdd)*i(vsupply))=2.90506e-08 FROM 1.3617e-05 TO 1.3917e-05
+p111: AVG(-v(vdd)*i(vsupply))=1.01549e-09 FROM 1.5617e-05 TO 1.5917e-05
+static_nw: (p000+p001+p100+p101+p010+p011+p110+p111)*1e9/8=16.5105
+ok000: ((v(sum)< 0.45 )*(v(cout)< 0.45 ))=1 at 5e-10
+ok001: ((v(sum)> 0.45 )*(v(cout)< 0.45 ))=1 at 1.5e-09
+ok100: ((v(sum)> 0.45 )*(v(cout)< 0.45 ))=1 at 2.5e-09
+ok101: ((v(sum)< 0.45 )*(v(cout)> 0.45 ))=1 at 3.5e-09
+ok010: ((v(sum)> 0.45 )*(v(cout)< 0.45 ))=1 at 4.5e-09
+ok011: ((v(sum)< 0.45 )*(v(cout)> 0.45 ))=1 at 5.5e-09
+ok110: ((v(sum)< 0.45 )*(v(cout)> 0.45 ))=1 at 6.5e-09
+ok111: ((v(sum)> 0.45 )*(v(cout)> 0.45 ))=1 at 7.5e-09
+truth_pass: ok000*ok001*ok100*ok101*ok010*ok011*ok110*ok111=1
+supply_w: AVG(-v(vdd)*i(vsupply))=1.15422e-06 FROM 0 TO 1.6e-08
+dynamic_uw: supply_w*1e6-static_nw/1000=1.13771
+pdp_aws: dynamic_uw*delay_ps=50.6952
+
+Total elapsed time: 6.111 seconds.
+

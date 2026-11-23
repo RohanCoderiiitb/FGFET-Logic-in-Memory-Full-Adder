@@ -1,11 +1,13 @@
 * Figure 5(a) - conventional 28-FET CMOS full adder
 * Table III comparison, Kim et al., DOI 10.1109/ACCESS.2023.3310823
-.include ./models/cmos_32nm.pm
-* Area estimate per repository: 28 * (3.75 um^2 / 28) = 3.75 um^2.
-* Physical cell area requires layout extraction.
-.param VSUP=0.9 VAB=1 EDGE=10p LG=32n
-.param WN=216.0n WP=607.5n WNI=270.0n WPI_SUM=526.5n WPI_COUT=216.0n
-.param CLOAD_SUM=0.4f CLOAD_COUT=7.589f
+.include cmos_32nm.pm
+* Published area reference: 3.75 um^2 (Table III).
+* Physical area of this fitted circuit requires a cell layout.
+* Fitted widths, output loads, and 30 nm Sum PMOS drawn length.
+* Dynamic power uses the 0-16 ns supply average minus settled leakage.
+.param VSUP=0.9 VAB=0.9 EDGE=10p LG=32n
+.param WN=64n WP=128n WNI=80n WPI_SUM=110.665n WPI_COUT=40n
+.param CLOAD_SUM=1.108f CLOAD_COUT=1.4015f
 .temp 27
 
 VSUPPLY vdd 0 {VSUP}
@@ -51,7 +53,7 @@ MSN7 sn_cb a 0 0 nmos_32nm L={LG} W={WN}
 * Output inverters and external lumped loads
 MCOP cout cbar vdd vdd pmos_32nm L={LG} W={WPI_COUT}
 MCON cout cbar 0 0 nmos_32nm L={LG} W={WNI}
-MSOP sum sbar vdd vdd pmos_32nm L={LG} W={WPI_SUM}
+MSOP sum sbar vdd vdd pmos_32nm L=30n W={WPI_SUM}
 MSON sum sbar 0 0 nmos_32nm L={LG} W={WNI}
 CCOUT cout 0 {CLOAD_COUT}
 CSUM sum 0 {CLOAD_SUM}
@@ -85,4 +87,7 @@ CSUM sum 0 {CLOAD_SUM}
 .meas tran OK110 FIND ((V(sum)<{VSUP/2})*(V(cout)>{VSUP/2})) AT=6.5n
 .meas tran OK111 FIND ((V(sum)>{VSUP/2})*(V(cout)>{VSUP/2})) AT=7.5n
 .meas tran Truth_pass PARAM OK000*OK001*OK100*OK101*OK010*OK011*OK110*OK111
+.meas tran Supply_W AVG (-V(vdd)*I(VSUPPLY)) FROM=0 TO=16n
+.meas tran Dynamic_uW PARAM Supply_W*1e6-Static_nW/1000
+.meas tran PDP_aWs PARAM Dynamic_uW*Delay_ps
 .end
