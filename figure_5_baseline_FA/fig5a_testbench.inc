@@ -2,7 +2,7 @@
 * Table III comparison, Kim et al., DOI 10.1109/ACCESS.2023.3310823
 * Area estimate per repository: 28 * (3.75 um^2 / 28) = 3.75 um^2.
 * Physical cell area requires layout extraction.
-.param VSUP=0.9 VAB=1 EDGE=10p LG=32n
+.param VSUP=0.9 VAB=0.9 EDGE=10p LG=32n
 .param WN=216.0n WP=607.5n WNI=270.0n WPI_SUM=526.5n WPI_COUT=216.0n
 .param CLOAD_SUM=0.4f CLOAD_COUT=7.589f
 .temp 27
@@ -25,7 +25,7 @@ CCOUT cout 0 {CLOAD_COUT}
 CSUM sum 0 {CLOAD_SUM}
 
 .options plotwinsize=0 reltol=1e-4 gmin=1e-15 numdgt=8
-.save V(a) V(b) V(cin) V(sum) V(cout) V(vdd) I(VSUPPLY)
+*.save V(a) V(b) V(cin) V(sum) V(cout) V(vdd) I(VSUPPLY)
 .meas tran Cin_high_V MAX V(cin) FROM=0 TO=8n
 .meas tran Delay_s TRIG V(cin) VAL={VSUP/2} TD=4.5n RISE=1
 + TARG V(cout) VAL={VSUP/2} TD=4.5n RISE=1
