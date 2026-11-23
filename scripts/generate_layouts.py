@@ -2,15 +2,11 @@
 """Programmatic 32nm GDSII and High-Resolution Layout Generator for:
 Figure 9: (a) Conventional 28-FET, (b) A-type, (c) B-type, (d) C-type Full Adders
 
-Precision Visual & Topological Match to Figure 9(a)-(d) in Kim et al. (IEEE Access 2023):
-1. Segmented local poly gates per transistor row (instead of full-height bars) matching Fig 9b, 9c, 9d.
-2. Complete Source/Drain contact squares (CONT) and local M1 S/D straps on every diffusion island.
-3. Non-overlapping GDSII text labels (mag=0.075-0.085 um) placed at exact paper coordinates.
-4. Outer boundary rails set so Cadence Virtuoso ruler measures exact paper areas:
-   - 28-FET: 2.50 x 1.50 = 3.75 um^2
-   - A-type: 1.76 x 1.40 = 2.46 um^2
-   - B-type: 1.87 x 1.20 = 2.24 um^2
-   - C-type: 1.95 x 1.30 = 2.535 um^2
+Dimensions derived directly from our calibrated LTspice transistor sizing and 32nm ITRS pitches:
+- 28-FET: 2.47 um x 1.47 um = 3.63 um^2 (Paper: 3.75 um^2, -3.2% deviation)
+- A-type: 1.73 um x 1.37 um = 2.37 um^2 (Paper: 2.46 um^2, -3.7% deviation, 34.7% reduction)
+- B-type: 1.80 um x 1.16 um = 2.09 um^2 (Paper: 2.24 um^2, -6.7% deviation, 42.4% reduction)
+- C-type: 1.87 um x 1.26 um = 2.36 um^2 (Paper: 2.53 um^2, -6.7% deviation, 35.0% reduction)
 """
 
 import math
@@ -26,8 +22,8 @@ class GdsWriter:
         self._write_rec(0x00, 0x02, struct.pack(">h", 600))
         self._write_rec(0x01, 0x02, struct.pack(">12h", 2026, 11, 23, 21, 0, 0, 2026, 11, 23, 21, 0, 0))
         self._write_rec(0x02, 0x06, self._pad_str(libname))
-        u1 = self._real8(0.001)  # 1 nm per user unit (um)
-        u2 = self._real8(1e-9)   # 1 nm in meters
+        u1 = self._real8(0.001)
+        u2 = self._real8(1e-9)
         self._write_rec(0x03, 0x05, u1 + u2)
 
     def _real8(self, val):
@@ -83,8 +79,8 @@ class GdsWriter:
 
 
 LAYER_NWELL   = 1
-LAYER_NDIFF   = 2    # dt=0
-LAYER_PDIFF   = 2    # dt=1
+LAYER_NDIFF   = 2
+LAYER_PDIFF   = 2
 LAYER_PIMP    = 3
 LAYER_NIMP    = 4
 LAYER_POLY    = 6
@@ -103,8 +99,8 @@ LAYER_PIN     = 100
 class LayoutBuilder:
     def __init__(self, name, width_um, height_um):
         self.name = name
-        self.w_nm = int(width_um * 1000)
-        self.h_nm = int(height_um * 1000)
+        self.w_nm = int(round(width_um * 1000))
+        self.h_nm = int(round(height_um * 1000))
         self.area_um2 = width_um * height_um
         self.rects = []
         self.texts = []
@@ -117,26 +113,21 @@ class LayoutBuilder:
         self.add_rect(layer_via, 0, cx - sz//2, cy - sz//2, cx + sz//2, cy + sz//2)
 
     def add_mos_island(self, is_pmos, x1, y1, x2, y2, n_gates, vfet_gates=None):
-        """Builds a complete multi-finger transistor diffusion island with local poly gates,
-        S/D M1 straps, S/D contacts, and optional VFET pillars on specified gate indices."""
         dt = 1 if is_pmos else 0
         self.add_rect(LAYER_PDIFF if is_pmos else LAYER_NDIFF, dt, x1, y1, x2, y2)
         w_box = x2 - x1
         pitch = w_box / (n_gates + 1)
         ymid = (y1 + y2) // 2
 
-        # S/D contacts + local M1 straps
         for i in range(n_gates + 1):
             sx = int(x1 + (i + 0.5) * (w_box / (n_gates + 1)))
             self.add_rect(LAYER_M1, 0, sx - 16, y1 + 10, sx + 16, y2 - 10)
             self.add_contact(sx, ymid, LAYER_CONT)
 
-        # Segmented Poly gates
         for g in range(n_gates):
             gx = int(x1 + (g + 1) * pitch)
             self.add_rect(LAYER_POLY, 0, gx - 16, y1 - 35, gx + 16, y2 + 35)
             if vfet_gates and g in vfet_gates:
-                # Add monolithic VFET pillar & contact on this gate extension
                 vy = y1 - 35 if (g % 2 == 0) else y2 + 35
                 self.add_rect(LAYER_VFET, 0, gx - 28, vy - 28, gx + 28, vy + 28)
                 self.add_contact(gx, vy, LAYER_VIA2)
@@ -154,55 +145,47 @@ class LayoutBuilder:
 
 
 # -------------------------------------------------------------------------
-# Cell 1: Fig 9(a) Conventional 28-FET Full Adder (2.50 x 1.50 = 3.75 um^2)
+# Cell 1: Fig 9(a) Conventional 28-FET Full Adder (2.47 x 1.47 = 3.63 um^2)
 # -------------------------------------------------------------------------
 def build_28fet():
-    W, H = 2.50, 1.50
+    W, H = 2.47, 1.47
     lb = LayoutBuilder("FA_28FET_CONVENTIONAL", W, H)
     w_nm, h_nm = lb.w_nm, lb.h_nm
 
-    # Outer edge-to-edge M1 Rails (0 to w_nm, 0 to h_nm so ruler reads 2.50 x 1.50!)
     lb.add_rect(LAYER_M1, 0, 0, h_nm - 80, w_nm, h_nm)
     lb.add_rect(LAYER_M1, 0, 0, 0, w_nm, 80)
+    lb.add_rect(LAYER_NWELL, 0, 0, h_nm - 440, w_nm, h_nm)
 
-    # N-Well & Implants
-    lb.add_rect(LAYER_NWELL, 0, 0, h_nm - 450, w_nm, h_nm)
-
-    # Segmented Active Diffusion Island Blocks (matching Fig 9a)
-    for x1, x2 in [(70, 520), (600, 1050), (1130, 1750), (1830, 2420)]:
-        lb.add_rect(LAYER_PDIFF, 1, x1, h_nm - 370, x2, h_nm - 140)
-        lb.add_rect(LAYER_NDIFF, 0, x1, 140, x2, 350)
+    for x1, x2 in [(70, 520), (600, 1050), (1130, 1750), (1830, 2400)]:
+        lb.add_rect(LAYER_PDIFF, 1, x1, h_nm - 360, x2, h_nm - 135)
+        lb.add_rect(LAYER_NDIFF, 0, x1, 135, x2, 340)
 
     for x1, x2 in [(250, 520), (750, 1050), (1280, 1580), (1830, 2120)]:
-        lb.add_rect(LAYER_NDIFF, 0, x1, 560, x2, 720)
+        lb.add_rect(LAYER_NDIFF, 0, x1, 550, x2, 710)
 
-    # 14 Vertical Poly Gates
-    poly_xs = [160, 310, 440, 690, 840, 970, 1220, 1370, 1500, 1660, 1920, 2050, 2200, 2330]
+    poly_xs = [160, 310, 440, 690, 840, 970, 1220, 1370, 1500, 1660, 1920, 2050, 2200, 2320]
     for px in poly_xs:
-        lb.add_rect(LAYER_POLY, 0, px - 16, 100, px + 16, h_nm - 100)
+        lb.add_rect(LAYER_POLY, 0, px - 16, 95, px + 16, h_nm - 95)
 
-    # Vertical S/D M1 connections to VDD / GND / internal nodes
-    sd_xs = [100, 235, 375, 490, 635, 765, 905, 1020, 1165, 1295, 1435, 1580, 1720, 1860, 1985, 2125, 2265, 2390]
+    sd_xs = [100, 235, 375, 490, 635, 765, 905, 1020, 1165, 1295, 1435, 1580, 1720, 1860, 1985, 2125, 2265, 2375]
     for idx, sx in enumerate(sd_xs):
-        y_top = h_nm - 20 if idx % 3 == 0 else h_nm - 140
-        lb.add_rect(LAYER_M1, 0, sx - 18, h_nm - 370, sx + 18, y_top)
-        lb.add_contact(sx, h_nm - 255)
-        y_bot = 20 if idx % 3 == 0 else 140
-        lb.add_rect(LAYER_M1, 0, sx - 18, y_bot, sx + 18, 350)
-        lb.add_contact(sx, 245)
+        y_top = h_nm - 20 if idx % 3 == 0 else h_nm - 135
+        lb.add_rect(LAYER_M1, 0, sx - 18, h_nm - 360, sx + 18, y_top)
+        lb.add_contact(sx, h_nm - 250)
+        y_bot = 20 if idx % 3 == 0 else 135
+        lb.add_rect(LAYER_M1, 0, sx - 18, y_bot, sx + 18, 340)
+        lb.add_contact(sx, 240)
 
-    # Horizontal M1 Signal Buses
     for x1, x2, y in [
-        (100, 2390, 1140), (235, 1985, 1020), (100, 2265, 900),
-        (375, 2125, 780), (100, 2390, 490), (235, 2125, 390),
+        (100, 2375, 1120), (235, 1985, 1000), (100, 2265, 885),
+        (375, 2125, 765), (100, 2375, 480), (235, 2125, 385),
     ]:
         lb.add_rect(LAYER_M1, 0, x1, y - 22, x2, y + 22)
 
-    # Vertical M2 Interconnect Jumpers + Via1
     for x, y1, y2 in [
-        (235, 245, 1140), (490, 390, 1020), (765, 245, 1140),
-        (1020, 490, 1140), (1295, 245, 900), (1580, 390, 1140),
-        (1860, 245, 1020), (2125, 390, 1140), (2390, 245, 1140)
+        (235, 240, 1120), (490, 385, 1000), (765, 240, 1120),
+        (1020, 480, 1120), (1295, 240, 885), (1580, 385, 1120),
+        (1860, 240, 1000), (2125, 385, 1120), (2375, 240, 1120)
     ]:
         lb.add_rect(LAYER_M2, 0, x - 20, y1, x + 20, y2)
         lb.add_contact(x, y1, LAYER_VIA1)
@@ -210,228 +193,198 @@ def build_28fet():
 
     lb.add_text(LAYER_PIN, 0, w_nm - 200, h_nm - 40, "VDD", 0.085)
     lb.add_text(LAYER_PIN, 0, w_nm - 420, 40, "GND", 0.085)
-    lb.add_text(LAYER_PIN, 0, 110, 780, "Cin", 0.085)
-    lb.add_text(LAYER_PIN, 0, 440, 840, "A", 0.085)
-    lb.add_text(LAYER_PIN, 0, 820, 780, "Cout", 0.095)
-    lb.add_text(LAYER_PIN, 0, 1500, 780, "B", 0.085)
-    lb.add_text(LAYER_PIN, 0, 2180, 780, "Sum", 0.095)
+    lb.add_text(LAYER_PIN, 0, 110, 765, "Cin", 0.085)
+    lb.add_text(LAYER_PIN, 0, 440, 825, "A", 0.085)
+    lb.add_text(LAYER_PIN, 0, 820, 765, "Cout", 0.095)
+    lb.add_text(LAYER_PIN, 0, 1500, 765, "B", 0.085)
+    lb.add_text(LAYER_PIN, 0, 2160, 765, "Sum", 0.095)
 
     return lb
 
 
 # -------------------------------------------------------------------------
-# Cell 2: Fig 9(b) FGFET-Based Full Adder A-Type (1.76 x 1.40 = 2.46 um^2)
+# Cell 2: Fig 9(b) FGFET-Based Full Adder A-Type (1.73 x 1.37 = 2.37 um^2)
 # -------------------------------------------------------------------------
 def build_atype():
-    W, H = 1.76, 1.40
+    W, H = 1.73, 1.37
     lb = LayoutBuilder("FA_ATYPE_FGFET", W, H)
     w_nm, h_nm = lb.w_nm, lb.h_nm
 
-    # Edge-to-edge rails so ruler reads 1.76 x 1.40
     lb.add_rect(LAYER_M1, 0, 0, h_nm - 75, w_nm, h_nm)
     lb.add_rect(LAYER_M1, 0, 0, 0, w_nm, 75)
-    lb.add_rect(LAYER_NWELL, 0, 0, h_nm - 360, w_nm, h_nm)
+    lb.add_rect(LAYER_NWELL, 0, 0, h_nm - 350, w_nm, h_nm)
 
-    # Top row: Precharge PMOS & Output Inverter PMOS islands with full S/D straps
-    lb.add_mos_island(True, 80, h_nm - 310, 380, h_nm - 130, 2)
-    lb.add_mos_island(True, 460, h_nm - 310, 760, h_nm - 130, 2)
-    lb.add_mos_island(True, 940, h_nm - 310, 1480, h_nm - 130, 3)
+    lb.add_mos_island(True, 75, h_nm - 300, 370, h_nm - 125, 2)
+    lb.add_mos_island(True, 450, h_nm - 300, 750, h_nm - 125, 2)
+    lb.add_mos_island(True, 920, h_nm - 300, 1460, h_nm - 125, 3)
 
-    # Middle row: Logic NMOS islands (Cin, A)
-    lb.add_mos_island(False, 80, 760, 560, 920, 3)
-    lb.add_mos_island(False, 680, 760, 1140, 920, 3)
-    lb.add_mos_island(False, 1220, 760, 1540, 920, 2)
+    lb.add_mos_island(False, 75, 740, 550, 900, 3)
+    lb.add_mos_island(False, 665, 740, 1120, 900, 3)
+    lb.add_mos_island(False, 1200, 740, 1520, 900, 2)
 
-    # Lower-middle row: Logic NMOS (A, !A)
-    lb.add_mos_island(False, 360, 500, 820, 660, 3)
-    lb.add_mos_island(False, 920, 500, 1480, 660, 3)
+    lb.add_mos_island(False, 350, 490, 800, 650, 3)
+    lb.add_mos_island(False, 900, 490, 1460, 650, 3)
 
-    # Bottom row: 3 FGFET pull-down branches with VFET pillars
-    lb.add_mos_island(False, 80, 210, 420, 380, 2, vfet_gates=[0])
-    lb.add_mos_island(False, 560, 210, 920, 380, 2, vfet_gates=[1])
-    lb.add_mos_island(False, 1080, 210, 1460, 380, 2, vfet_gates=[0])
+    lb.add_mos_island(False, 75, 205, 410, 370, 2, vfet_gates=[0])
+    lb.add_mos_island(False, 550, 205, 900, 370, 2, vfet_gates=[1])
+    lb.add_mos_island(False, 1060, 205, 1440, 370, 2, vfet_gates=[0])
 
-    # Horizontal M1 / M3 Interconnect Buses (matching Fig 9b)
     for lyr, x1, x2, y in [
-        (LAYER_M1, 60, 1620, 1030),
-        (LAYER_M3, 60, 1580, 955),
-        (LAYER_M1, 140, 1560, 710),
-        (LAYER_M3, 240, 1560, 445),
-        (LAYER_M1, 120, 1460, 310),
-        (LAYER_M3, 120, 1460, 155),
+        (LAYER_M1, 60, 1600, 1010),
+        (LAYER_M3, 60, 1560, 935),
+        (LAYER_M1, 130, 1540, 695),
+        (LAYER_M3, 230, 1540, 435),
+        (LAYER_M1, 110, 1440, 305),
+        (LAYER_M3, 110, 1440, 150),
     ]:
         lb.add_rect(lyr, 0, x1, y - 20, x2, y + 20)
 
-    # Vertical M2 / M4 Routing Columns
     for lyr, x, y1, y2 in [
-        (LAYER_M2, 110, 155, 1260),
-        (LAYER_M2, 340, 155, 1030),
-        (LAYER_M2, 620, 155, 1180),
-        (LAYER_M4, 860, 155, 1220),
-        (LAYER_M2, 1160, 155, 1030),
-        (LAYER_M4, 1420, 155, 1240),
-        (LAYER_M2, 1640, 75, 1300),
+        (LAYER_M2, 105, 150, 1235),
+        (LAYER_M2, 335, 150, 1010),
+        (LAYER_M2, 610, 150, 1160),
+        (LAYER_M4, 845, 150, 1200),
+        (LAYER_M2, 1140, 150, 1010),
+        (LAYER_M4, 1400, 150, 1215),
+        (LAYER_M2, 1615, 75, 1275),
     ]:
         lb.add_rect(lyr, 0, x - 18, y1, x + 18, y2)
         lb.add_contact(x, y1 + 20, LAYER_VIA1)
         lb.add_contact(x, y2 - 20, LAYER_VIA1)
 
-    lb.add_text(LAYER_PIN, 0, w_nm - 260, h_nm - 38, "VDD", 0.08)
-    lb.add_text(LAYER_PIN, 0, w_nm - 260, 115, "GND", 0.08)
-    lb.add_text(LAYER_PIN, 0, 420, 1065, "Cout", 0.08)
-    lb.add_text(LAYER_PIN, 0, 1260, 1065, "Sum", 0.08)
-    lb.add_text(LAYER_PIN, 0, 590, 840, "Cin", 0.08)
-    lb.add_text(LAYER_PIN, 0, 520, 600, "A", 0.08)
-    lb.add_text(LAYER_PIN, 0, 460, 450, "WL", 0.08)
-    lb.add_text(LAYER_PIN, 0, 960, 310, "B", 0.085)
-    lb.add_text(LAYER_PIN, 0, 1680, 450, "CLK", 0.08)
+    lb.add_text(LAYER_PIN, 0, w_nm - 250, h_nm - 38, "VDD", 0.08)
+    lb.add_text(LAYER_PIN, 0, w_nm - 250, 115, "GND", 0.08)
+    lb.add_text(LAYER_PIN, 0, 415, 1045, "Cout", 0.08)
+    lb.add_text(LAYER_PIN, 0, 1240, 1045, "Sum", 0.08)
+    lb.add_text(LAYER_PIN, 0, 580, 825, "Cin", 0.08)
+    lb.add_text(LAYER_PIN, 0, 510, 585, "A", 0.08)
+    lb.add_text(LAYER_PIN, 0, 450, 440, "WL", 0.08)
+    lb.add_text(LAYER_PIN, 0, 945, 305, "B", 0.085)
+    lb.add_text(LAYER_PIN, 0, 1655, 440, "CLK", 0.08)
 
     return lb
 
 
 # -------------------------------------------------------------------------
-# Cell 3: Fig 9(c) FGFET-Based Full Adder B-Type (1.87 x 1.20 = 2.24 um^2)
+# Cell 3: Fig 9(c) FGFET-Based Full Adder B-Type (1.80 x 1.16 = 2.09 um^2)
 # -------------------------------------------------------------------------
 def build_btype():
-    W, H = 1.87, 1.20
+    W, H = 1.80, 1.16
     lb = LayoutBuilder("FA_BTYPE_FGFET", W, H)
     w_nm, h_nm = lb.w_nm, lb.h_nm
 
-    # Edge-to-edge top/bottom M1 bitlines (ruler reads 1.87 x 1.20)
-    lb.add_rect(LAYER_M1, 0, 0, h_nm - 65, w_nm, h_nm)
-    lb.add_rect(LAYER_M1, 0, 0, 0, w_nm, 65)
+    lb.add_rect(LAYER_M1, 0, 0, h_nm - 62, w_nm, h_nm)
+    lb.add_rect(LAYER_M1, 0, 0, 0, w_nm, 62)
+    lb.add_rect(LAYER_NWELL, 0, 1290, 62, w_nm, h_nm - 62)
 
-    # Right N-Well for Output Inverters & Precharge PMOS
-    lb.add_rect(LAYER_NWELL, 0, 1340, 65, w_nm, h_nm - 65)
+    lb.add_mos_island(False, 95, h_nm - 240, 615, h_nm - 95, 3, vfet_gates=[0, 2])
+    lb.add_mos_island(False, 690, h_nm - 240, 1230, h_nm - 95, 3, vfet_gates=[0, 2])
 
-    # Top NMOS + FGFET Array Islands (Sum branches, matching Fig 9c top green blocks)
-    lb.add_mos_island(False, 100, h_nm - 250, 640, h_nm - 100, 3, vfet_gates=[0, 2])
-    lb.add_mos_island(False, 720, h_nm - 250, 1280, h_nm - 100, 3, vfet_gates=[0, 2])
+    lb.add_mos_island(False, 210, 640, 715, 785, 3)
+    lb.add_mos_island(False, 790, 640, 1230, 785, 2)
+    lb.add_mos_island(False, 210, 355, 715, 500, 3)
 
-    # Middle NMOS Array Islands (Cin / !Cin gating)
-    lb.add_mos_island(False, 220, 660, 740, 810, 3)
-    lb.add_mos_island(False, 820, 660, 1280, 810, 2)
-    lb.add_mos_island(False, 220, 370, 740, 520, 3)
+    lb.add_mos_island(False, 95, 95, 615, 240, 3, vfet_gates=[0, 2])
+    lb.add_mos_island(False, 690, 95, 1100, 240, 2, vfet_gates=[1])
 
-    # Bottom NMOS + FGFET Array Islands (Cout branches, matching Fig 9c bottom green blocks)
-    lb.add_mos_island(False, 100, 100, 640, 250, 3, vfet_gates=[0, 2])
-    lb.add_mos_island(False, 720, 100, 1140, 250, 2, vfet_gates=[1])
+    lb.add_mos_island(True, 1330, 655, 1715, 925, 2)
+    lb.add_mos_island(True, 1330, 175, 1715, 445, 2)
 
-    # Right Output Inverters & Precharge PMOS islands (Pink blocks on right of Fig 9c)
-    lb.add_mos_island(True, 1380, 680, 1780, 960, 2)
-    lb.add_mos_island(True, 1380, 180, 1780, 460, 2)
+    lb.add_rect(LAYER_M4, 0, 325, 95, 395, h_nm - 95)
 
-    # Vertical M4 Wordline Pillar Bus (Purple vertical bar on left-center of Fig 9c)
-    lb.add_rect(LAYER_M4, 0, 340, 100, 410, h_nm - 100)
-
-    # Horizontal M1 / M3 Bitlines & Routing
     for lyr, x1, x2, y in [
-        (LAYER_M1, 100, 1340, 890),
-        (LAYER_M3, 140, 1520, 735),
-        (LAYER_M1, 100, 1720, 590),
-        (LAYER_M3, 140, 1520, 445),
-        (LAYER_M1, 100, 1340, 290),
+        (LAYER_M1, 95, 1290, 860),
+        (LAYER_M3, 135, 1465, 710),
+        (LAYER_M1, 95, 1655, 570),
+        (LAYER_M3, 135, 1465, 430),
+        (LAYER_M1, 95, 1290, 280),
     ]:
-        lb.add_rect(lyr, 0, x1, y - 20, x2, y + 20)
+        lb.add_rect(lyr, 0, x1, y - 19, x2, y + 19)
 
-    # Vertical M2 Interconnects
-    for x in [90, 280, 580, 880, 1180, 1350, 1810]:
-        lb.add_rect(LAYER_M2, 0, x - 18, 65, x + 18, h_nm - 65)
-        lb.add_contact(x, 590, LAYER_VIA1)
+    for x in [85, 270, 560, 850, 1135, 1300, 1745]:
+        lb.add_rect(LAYER_M2, 0, x - 17, 62, x + 17, h_nm - 62)
+        lb.add_contact(x, 570, LAYER_VIA1)
 
-    # Non-overlapping clean labels matching Fig 9(c)
-    lb.add_text(LAYER_PIN, 0, 45, 500, "BL", 0.075)
-    lb.add_text(LAYER_PIN, 0, 990, h_nm - 105, "!A", 0.075)
-    lb.add_text(LAYER_PIN, 0, 560, 845, "!B", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1060, 735, "B", 0.08)
-    lb.add_text(LAYER_PIN, 0, 560, 635, "Cin", 0.075)
-    lb.add_text(LAYER_PIN, 0, 780, 635, "GND", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1270, 735, "SUM", 0.075)
-    lb.add_text(LAYER_PIN, 0, 580, 445, "!Cin", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1270, 395, "Cout", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1825, 480, "VDD", 0.075)
-    lb.add_text(LAYER_PIN, 0, 375, 90, "A", 0.075)
-    lb.add_text(LAYER_PIN, 0, 880, 90, "1", 0.075)
+    lb.add_text(LAYER_PIN, 0, 42, 485, "BL", 0.075)
+    lb.add_text(LAYER_PIN, 0, 955, h_nm - 100, "!A", 0.075)
+    lb.add_text(LAYER_PIN, 0, 540, 815, "!B", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1020, 710, "B", 0.08)
+    lb.add_text(LAYER_PIN, 0, 540, 615, "Cin", 0.075)
+    lb.add_text(LAYER_PIN, 0, 750, 615, "GND", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1225, 710, "SUM", 0.075)
+    lb.add_text(LAYER_PIN, 0, 560, 430, "!Cin", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1225, 380, "Cout", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1755, 465, "VDD", 0.075)
+    lb.add_text(LAYER_PIN, 0, 360, 85, "A", 0.075)
+    lb.add_text(LAYER_PIN, 0, 850, 85, "1", 0.075)
 
     return lb
 
 
 # -------------------------------------------------------------------------
-# Cell 4: Fig 9(d) FGFET-Based Full Adder C-Type (1.95 x 1.30 = 2.535 um^2)
+# Cell 4: Fig 9(d) FGFET-Based Full Adder C-Type (1.87 x 1.26 = 2.36 um^2)
 # -------------------------------------------------------------------------
 def build_ctype():
-    W, H = 1.95, 1.30
+    W, H = 1.87, 1.26
     lb = LayoutBuilder("FA_CTYPE_FGFET", W, H)
     w_nm, h_nm = lb.w_nm, lb.h_nm
 
-    # Edge-to-edge top/bottom M1 rails (ruler reads 1.95 x 1.30 = 2.535 um^2)
-    lb.add_rect(LAYER_M1, 0, 0, h_nm - 65, w_nm, h_nm)
-    lb.add_rect(LAYER_M1, 0, 0, 0, w_nm, 65)
+    lb.add_rect(LAYER_M1, 0, 0, h_nm - 62, w_nm, h_nm)
+    lb.add_rect(LAYER_M1, 0, 0, 0, w_nm, 62)
+    lb.add_rect(LAYER_NWELL, 0, 1400, 62, w_nm, h_nm - 62)
 
-    # Right N-Well for Output Inverters & Precharge PMOS
-    lb.add_rect(LAYER_NWELL, 0, 1460, 65, w_nm, h_nm - 65)
+    lb.add_mos_island(False, 115, 930, 615, 1095, 3, vfet_gates=[1])
+    lb.add_mos_island(False, 730, 930, 1305, 1095, 3, vfet_gates=[1])
 
-    # Segmented Transistor Islands with full S/D contacts & local poly gates (matching Fig 9d)
-    # Row 1 (Top left & top center)
-    lb.add_mos_island(False, 120, 960, 640, 1130, 3, vfet_gates=[1])
-    lb.add_mos_island(False, 760, 960, 1360, 1130, 3, vfet_gates=[1])
+    lb.add_mos_island(False, 155, 660, 710, 825, 3, vfet_gates=[2])
+    lb.add_mos_island(False, 805, 660, 1360, 825, 3, vfet_gates=[1])
 
-    # Row 2 (Upper-middle array)
-    lb.add_mos_island(False, 160, 680, 740, 850, 3, vfet_gates=[2])
-    lb.add_mos_island(False, 840, 680, 1420, 850, 3, vfet_gates=[1])
+    lb.add_mos_island(False, 325, 405, 880, 560, 3)
+    lb.add_mos_island(False, 980, 405, 1380, 560, 2)
 
-    # Row 3 (Lower-middle array)
-    lb.add_mos_island(False, 340, 420, 920, 580, 3)
-    lb.add_mos_island(False, 1020, 420, 1440, 580, 2)
+    lb.add_mos_island(False, 230, 135, 825, 300, 3, vfet_gates=[1])
+    lb.add_mos_island(False, 920, 135, 1380, 300, 2, vfet_gates=[0])
 
-    # Row 4 (Bottom array)
-    lb.add_mos_island(False, 240, 140, 860, 310, 3, vfet_gates=[1])
-    lb.add_mos_island(False, 960, 140, 1440, 310, 2, vfet_gates=[0])
+    lb.add_mos_island(True, 1440, 755, 1785, 1045, 2)
+    lb.add_mos_island(True, 1440, 155, 1785, 445, 2)
 
-    # Right Output Inverters & Precharge PMOS islands (Pink blocks on right of Fig 9d)
-    lb.add_mos_island(True, 1500, 780, 1860, 1080, 2)
-    lb.add_mos_island(True, 1500, 160, 1860, 460, 2)
+    lb.add_rect(LAYER_M4, 0, 815, 215, 885, 1045)
 
-    # Central M4 Vertical Wordline Bus (Purple bar in center of Fig 9d)
-    lb.add_rect(LAYER_M4, 0, 850, 220, 920, 1080)
-
-    # Horizontal M1 / M3 Bitlines & Interconnects
     for lyr, x1, x2, y in [
-        (LAYER_M1, 120, 1640, 905),
-        (LAYER_M3, 100, 1560, 765),
-        (LAYER_M1, 240, 1640, 630),
-        (LAYER_M3, 340, 1740, 495),
-        (LAYER_M1, 200, 1640, 360),
+        (LAYER_M1, 115, 1575, 875),
+        (LAYER_M3, 95, 1495, 740),
+        (LAYER_M1, 230, 1575, 610),
+        (LAYER_M3, 325, 1670, 480),
+        (LAYER_M1, 190, 1575, 350),
     ]:
-        lb.add_rect(lyr, 0, x1, y - 20, x2, y + 20)
+        lb.add_rect(lyr, 0, x1, y - 19, x2, y + 19)
 
-    # Vertical M2 Interconnect Columns
-    for x in [90, 320, 640, 980, 1300, 1520, 1860]:
-        lb.add_rect(LAYER_M2, 0, x - 18, 65, x + 18, h_nm - 65)
-        lb.add_contact(x, 765, LAYER_VIA1)
-        lb.add_contact(x, 495, LAYER_VIA1)
+    for x in [85, 305, 615, 940, 1245, 1460, 1785]:
+        lb.add_rect(LAYER_M2, 0, x - 17, 62, x + 17, h_nm - 62)
+        lb.add_contact(x, 740, LAYER_VIA1)
+        lb.add_contact(x, 480, LAYER_VIA1)
 
-    # Clean, well-separated labels matching Fig 9(d) with zero overlap
-    lb.add_text(LAYER_PIN, 0, 45, 765, "BL", 0.075)
-    lb.add_text(LAYER_PIN, 0, 215, 765, "Cin", 0.075)
-    lb.add_text(LAYER_PIN, 0, 150, 630, "A", 0.075)
-    lb.add_text(LAYER_PIN, 0, 640, 1045, "0", 0.075)
-    lb.add_text(LAYER_PIN, 0, 885, 1140, "!A", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1140, 765, "B", 0.08)
-    lb.add_text(LAYER_PIN, 0, 1000, 630, "!B", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1640, 980, "SUM", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1640, 830, "!Cin", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1890, 765, "VDD", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1450, 560, "GND", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1680, 310, "CLK", 0.075)
-    lb.add_text(LAYER_PIN, 0, 1340, 120, "Cout", 0.075)
+    lb.add_text(LAYER_PIN, 0, 42, 740, "BL", 0.075)
+    lb.add_text(LAYER_PIN, 0, 205, 740, "Cin", 0.075)
+    lb.add_text(LAYER_PIN, 0, 145, 610, "A", 0.075)
+    lb.add_text(LAYER_PIN, 0, 615, 1015, "0", 0.075)
+    lb.add_text(LAYER_PIN, 0, 850, 1105, "!A", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1095, 740, "B", 0.08)
+    lb.add_text(LAYER_PIN, 0, 960, 610, "!B", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1575, 950, "SUM", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1575, 805, "!Cin", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1815, 740, "VDD", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1390, 540, "GND", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1610, 300, "CLK", 0.075)
+    lb.add_text(LAYER_PIN, 0, 1285, 115, "Cout", 0.075)
 
     return lb
 
 
-def plot_layout(ax, lb, title, sublabel):
-    ax.set_title(f"{sublabel} {title}\nArea = {lb.area_um2:.2f} \u03bcm\u00b2 ({lb.w_nm/1000:.2f} \u03bcm \u00d7 {lb.h_nm/1000:.2f} \u03bcm)",
-                 fontsize=11, fontweight="bold", pad=8)
+def plot_layout(ax, lb, title, sublabel, paper_area):
+    dev_pct = (lb.area_um2 - paper_area) / paper_area * 100.0
+    ax.set_title(f"{sublabel} {title}\nOur Area = {lb.area_um2:.2f} \u03bcm\u00b2 ({lb.w_nm/1000:.2f} \u00d7 {lb.h_nm/1000:.2f} \u03bcm) | Paper = {paper_area:.2f} \u03bcm\u00b2 ({dev_pct:+.1f}%)",
+                 fontsize=10.5, fontweight="bold", pad=8)
 
     COLOR_MAP = {
         LAYER_NWELL: ("#f7efe8", 0.40, "#d9c2ad", 0.8),
@@ -492,13 +445,13 @@ def main():
     os.makedirs(plot_dir, exist_ok=True)
 
     cells = [
-        (build_28fet(), "(a)", "Conventional 28FET full adder layout", "fa_28fet.gds"),
-        (build_atype(), "(b)", "FGFET-based full adder A-type layout", "fa_atype.gds"),
-        (build_btype(), "(c)", "FGFET-based full adder B-type layout", "fa_btype.gds"),
-        (build_ctype(), "(d)", "FGFET-based full adder C-type layout", "fa_ctype.gds"),
+        (build_28fet(), "(a)", "Conventional 28FET full adder layout", "fa_28fet.gds", 3.75),
+        (build_atype(), "(b)", "FGFET-based full adder A-type layout", "fa_atype.gds", 2.46),
+        (build_btype(), "(c)", "FGFET-based full adder B-type layout", "fa_btype.gds", 2.24),
+        (build_ctype(), "(d)", "FGFET-based full adder C-type layout", "fa_ctype.gds", 2.53),
     ]
 
-    for lb, _, _, gds_name in cells:
+    for lb, _, _, gds_name, _ in cells:
         gds_path = os.path.join(gds_dir, gds_name)
         gw = GdsWriter(gds_path, libname=lb.name)
         lb.build_into_gds(gw)
@@ -506,31 +459,31 @@ def main():
 
     master_gds_path = os.path.join(gds_dir, "full_adders_all_fig9.gds")
     gw_master = GdsWriter(master_gds_path, libname="FGFET_FULL_ADDERS_ALL")
-    for lb, _, _, _ in cells:
+    for lb, _, _, _, _ in cells:
         lb.build_into_gds(gw_master)
     gw_master.close()
 
     fig, axes = plt.subplots(2, 2, figsize=(13, 11), dpi=300)
     axes = axes.flatten()
-    for idx, (lb, sublabel, title, _) in enumerate(cells):
-        plot_layout(axes[idx], lb, title, sublabel)
+    for idx, (lb, sublabel, title, _, paper_area) in enumerate(cells):
+        plot_layout(axes[idx], lb, title, sublabel, paper_area)
 
-    plt.suptitle("FIGURE 9 Replica: 32nm Full Adder Layouts (Cadence Virtuoso Style)\n"
-                 "(a) Conventional 28FET (3.75 \u03bcm\u00b2), (b) A-type (2.46 \u03bcm\u00b2), "
-                 "(c) B-type (2.24 \u03bcm\u00b2), (d) C-type (2.53 \u03bcm\u00b2)",
-                 fontsize=13, fontweight="bold", y=0.98)
+    plt.suptitle("FIGURE 9 Reproduction: 32nm Full Adder Layouts (Sized from Our LTspice Circuits)\n"
+                 "(a) 28FET: 3.63 \u03bcm\u00b2 (-3.2%), (b) A-type: 2.37 \u03bcm\u00b2 (-3.7%), "
+                 "(c) B-type: 2.09 \u03bcm\u00b2 (-6.7%), (d) C-type: 2.36 \u03bcm\u00b2 (-6.7%)",
+                 fontsize=12.5, fontweight="bold", y=0.98)
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.savefig(os.path.join(plot_dir, "fig9_layout_replica.png"), dpi=300)
     plt.close()
 
-    for lb, sublabel, title, _ in cells:
+    for lb, sublabel, title, _, paper_area in cells:
         f, ax = plt.subplots(figsize=(7, 6), dpi=300)
-        plot_layout(ax, lb, title, sublabel)
+        plot_layout(ax, lb, title, sublabel, paper_area)
         f.tight_layout()
         f.savefig(os.path.join(plot_dir, f"{lb.name.lower()}.png"), dpi=300)
         plt.close()
 
-    print("Successfully generated multi-island segmented 32nm GDSII layouts!")
+    print("Successfully generated layouts matching your calibrated LTspice dimensions (3.63, 2.37, 2.09, 2.36 um^2)!")
 
 if __name__ == "__main__":
     main()
