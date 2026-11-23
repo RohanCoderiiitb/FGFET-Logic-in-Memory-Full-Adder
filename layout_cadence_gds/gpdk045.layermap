@@ -1,0 +1,16 @@
+# Cadence gpdk045 Official Layer Map for 32nm FGFET Full Adders
+# CadenceLayer   Purpose     GDS_Layer   GDS_Datatype
+Nwell            drawing     1           0
+Oxide            drawing     2           0
+Oxide            drawing     2           1
+Poly             drawing     6           0
+Cont             drawing     7           0
+Metal1           drawing     8           0
+Via1             drawing     9           0
+Metal2           drawing     10          0
+Via2             drawing     11          0
+Metal3           drawing     12          0
+Via3             drawing     13          0
+Metal4           drawing     14          0
+CapMetal         drawing     20          0
+text             drawing     100         0

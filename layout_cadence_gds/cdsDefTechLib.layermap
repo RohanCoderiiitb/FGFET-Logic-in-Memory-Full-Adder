@@ -1,0 +1,16 @@
+# Universal Cadence cdsDefTechLib Layer Map (Works with cdsDefTechLib out-of-the-box)
+# CadenceLayer   Purpose     GDS_Layer   GDS_Datatype
+y0               drawing     1           0
+y2               drawing     2           0
+y1               drawing     2           1
+y4               drawing     6           0
+y3               drawing     7           0
+y5               drawing     8           0
+y7               drawing     9           0
+y3               drawing     10          0
+y7               drawing     11          0
+y5               drawing     12          0
+y7               drawing     13          0
+y6               drawing     14          0
+y8               drawing     20          0
+text             drawing     100         0
