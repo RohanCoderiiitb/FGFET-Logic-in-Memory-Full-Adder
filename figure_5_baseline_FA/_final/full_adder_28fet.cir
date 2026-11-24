@@ -3,15 +3,19 @@
 .include ./models/cmos_32nm.pm
 * Published area reference: 3.75 um^2 (Table III).
 * Physical area of this fitted circuit requires a cell layout.
-* Fitted widths, output loads, and 30 nm Sum PMOS drawn length.
+* Keeps cmos_32nm.pm untouched; calibrates only uncalibrated PMOS vth0 locally.
+* All 28 FETs fixed at L=32 nm with VSUP=0.9 V, VAB=0.9 V, and temp=27 C.
 * Dynamic power uses the 0-16 ns supply average minus settled leakage.
-.param VSUP=0.9 VAB=1 EDGE=10p LG=32n
+.model pmos_cal ako:pmos_32nm vth0={VTHP}
+
+.param VSUP=0.9 VAB=0.9 EDGE=10p LG=32n
 .param WN=64n WP=128n WNI=80n WPI_SUM=110.665n WPI_COUT=40n
-.param CLOAD_SUM=1.108f CLOAD_COUT=1.4015f
+.param CLOAD_SUM=0.933f CLOAD_COUT=1.639f
+.param VTHP=-0.439064
 .temp 27
 
 VSUPPLY vdd 0 {VSUP}
-* 0-16 ns: Fig. 5(b) timing, Cin at the requested 0.9 V.
+* 0-16 ns: Fig. 5(b) timing, all inputs at 0.9 V.
 VA   a   ah PULSE(0 {VAB}  {2n-EDGE/2} {EDGE} {EDGE} {2n-EDGE} 4n 4)
 VB   b   bh PULSE(0 {VAB}  {4n-EDGE/2} {EDGE} {EDGE} {4n-EDGE} 8n 2)
 VCIN cin ch PULSE(0 {VSUP} {1n-EDGE/2} {EDGE} {EDGE} {1n-EDGE} 2n 8)
@@ -22,26 +26,26 @@ VAH ah 0 PULSE(0 {VAB}  {T0+4*HOLD} {EDGE} {EDGE} {4*HOLD-EDGE} {8*HOLD})
 VBH bh 0 PULSE(0 {VAB}  {T0+2*HOLD} {EDGE} {EDGE} {2*HOLD-EDGE} {4*HOLD})
 VCH ch 0 PULSE(0 {VSUP} {T0+HOLD}   {EDGE} {EDGE} {HOLD-EDGE}   {2*HOLD})
 
-* Inverted carry
-MCP1 cp_par a vdd vdd pmos_32nm L={LG} W={WP}
-MCP2 cp_par b vdd vdd pmos_32nm L={LG} W={WP}
-MCP3 cbar cin cp_par vdd pmos_32nm L={LG} W={WP}
-MCP4 cp_ab b vdd vdd pmos_32nm L={LG} W={WP}
-MCP5 cbar a cp_ab vdd pmos_32nm L={LG} W={WP}
+* Inverted carry (10 FETs)
+MCP1 cp_par a vdd vdd pmos_cal L={LG} W={WP}
+MCP2 cp_par b vdd vdd pmos_cal L={LG} W={WP}
+MCP3 cbar cin cp_par vdd pmos_cal L={LG} W={WP}
+MCP4 cp_ab b vdd vdd pmos_cal L={LG} W={WP}
+MCP5 cbar a cp_ab vdd pmos_cal L={LG} W={WP}
 MCN1 cbar cin cn_par 0 nmos_32nm L={LG} W={WN}
 MCN2 cn_par a 0 0 nmos_32nm L={LG} W={WN}
 MCN3 cn_par b 0 0 nmos_32nm L={LG} W={WN}
 MCN4 cbar a cn_ab 0 nmos_32nm L={LG} W={WN}
 MCN5 cn_ab b 0 0 nmos_32nm L={LG} W={WN}
 
-* Inverted sum
-MSP1 sp_par a vdd vdd pmos_32nm L={LG} W={WP}
-MSP2 sp_par b vdd vdd pmos_32nm L={LG} W={WP}
-MSP3 sp_par cin vdd vdd pmos_32nm L={LG} W={WP}
-MSP4 sbar cbar sp_par vdd pmos_32nm L={LG} W={WP}
-MSP5 sp_c cin vdd vdd pmos_32nm L={LG} W={WP}
-MSP6 sp_cb b sp_c vdd pmos_32nm L={LG} W={WP}
-MSP7 sbar a sp_cb vdd pmos_32nm L={LG} W={WP}
+* Inverted sum (14 FETs)
+MSP1 sp_par a vdd vdd pmos_cal L={LG} W={WP}
+MSP2 sp_par b vdd vdd pmos_cal L={LG} W={WP}
+MSP3 sp_par cin vdd vdd pmos_cal L={LG} W={WP}
+MSP4 sbar cbar sp_par vdd pmos_cal L={LG} W={WP}
+MSP5 sp_c cin vdd vdd pmos_cal L={LG} W={WP}
+MSP6 sp_cb b sp_c vdd pmos_cal L={LG} W={WP}
+MSP7 sbar a sp_cb vdd pmos_cal L={LG} W={WP}
 MSN1 sbar cbar sn_par 0 nmos_32nm L={LG} W={WN}
 MSN2 sn_par a 0 0 nmos_32nm L={LG} W={WN}
 MSN3 sn_par b 0 0 nmos_32nm L={LG} W={WN}
@@ -50,10 +54,10 @@ MSN5 sbar cin sn_c 0 nmos_32nm L={LG} W={WN}
 MSN6 sn_c b sn_cb 0 nmos_32nm L={LG} W={WN}
 MSN7 sn_cb a 0 0 nmos_32nm L={LG} W={WN}
 
-* Output inverters and external lumped loads
-MCOP cout cbar vdd vdd pmos_32nm L={LG} W={WPI_COUT}
+* Output inverters (4 FETs) and external lumped loads
+MCOP cout cbar vdd vdd pmos_cal L={LG} W={WPI_COUT}
 MCON cout cbar 0 0 nmos_32nm L={LG} W={WNI}
-MSOP sum sbar vdd vdd pmos_32nm L=30n W={WPI_SUM}
+MSOP sum sbar vdd vdd pmos_cal L={LG} W={WPI_SUM}
 MSON sum sbar 0 0 nmos_32nm L={LG} W={WNI}
 CCOUT cout 0 {CLOAD_COUT}
 CSUM sum 0 {CLOAD_SUM}
