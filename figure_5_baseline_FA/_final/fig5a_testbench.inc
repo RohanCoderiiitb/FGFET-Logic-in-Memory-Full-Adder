@@ -15,9 +15,13 @@
 
 VSUPPLY vdd 0 {VSUP}
 * 0-16 ns: Fig. 5(b) timing, all inputs at 0.9 V.
-VA   a   ah PULSE(0 {VAB}  {2n-EDGE/2} {EDGE} {EDGE} {2n-EDGE} 4n 4)
-VB   b   bh PULSE(0 {VAB}  {4n-EDGE/2} {EDGE} {EDGE} {4n-EDGE} 8n 2)
-VCIN cin ch PULSE(0 {VSUP} {1n-EDGE/2} {EDGE} {EDGE} {1n-EDGE} 2n 8)
+*VA   a   ah PULSE(0 {VAB}  {2n-EDGE/2} {EDGE} {EDGE} {2n-EDGE} 4n 4)
+*VB   b   bh PULSE(0 {VAB}  {4n-EDGE/2} {EDGE} {EDGE} {4n-EDGE} 8n 2)
+*VCIN cin ch PULSE(0 {VSUP} {1n-EDGE/2} {EDGE} {EDGE} {1n-EDGE} 2n 8)
+
+VA a 0 {VAB}
+VB b 0 {VAB}
+VCIN cin 0 {VSUP}
 
 * After 17 ns, hold each binary vector long enough to measure leakage.
 .param T0=17n HOLD=2u
