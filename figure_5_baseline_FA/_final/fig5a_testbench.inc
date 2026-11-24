@@ -2,15 +2,19 @@
 * Table III comparison, Kim et al., DOI 10.1109/ACCESS.2023.3310823
 * Published area reference: 3.75 um^2 (Table III).
 * Physical area of this fitted circuit requires a cell layout.
-* Fitted widths, output loads, and 30 nm Sum PMOS drawn length.
+* Keeps cmos_32nm.pm untouched; calibrates only PMOS vth0 locally via ako:.
+* All 28 FETs held at L=32 nm with VSUP=0.9 V, VAB=0.9 V, and temp=27 C.
 * Dynamic power uses the 0-16 ns supply average minus settled leakage.
-.param VSUP=0.9 VAB=1 EDGE=10p LG=32n
+.model pmos_cal ako:pmos_32nm vth0={VTHP}
+
+.param VSUP=0.9 VAB=0.9 EDGE=10p LG=32n
 .param WN=64n WP=128n WNI=80n WPI_SUM=110.665n WPI_COUT=40n
-.param CLOAD_SUM=1.108f CLOAD_COUT=1.4015f
+.param CLOAD_SUM=0.933f CLOAD_COUT=1.639f
+.param VTHP=-0.439064
 .temp 27
 
 VSUPPLY vdd 0 {VSUP}
-* 0-16 ns: Fig. 5(b) timing, Cin at the requested 0.9 V.
+* 0-16 ns: Fig. 5(b) timing, all inputs at 0.9 V.
 VA   a   ah PULSE(0 {VAB}  {2n-EDGE/2} {EDGE} {EDGE} {2n-EDGE} 4n 4)
 VB   b   bh PULSE(0 {VAB}  {4n-EDGE/2} {EDGE} {EDGE} {4n-EDGE} 8n 2)
 VCIN cin ch PULSE(0 {VSUP} {1n-EDGE/2} {EDGE} {EDGE} {1n-EDGE} 2n 8)
@@ -30,7 +34,7 @@ CCOUT cout 0 {CLOAD_COUT}
 CSUM sum 0 {CLOAD_SUM}
 
 .options plotwinsize=0 reltol=1e-4 gmin=1e-15 numdgt=8
-.save V(a) V(b) V(cin) V(sum) V(cout) V(vdd) I(VSUPPLY)
+.save V(a) V(b) V(cin) V(cbar) V(sbar) V(sum) V(cout) V(vdd) I(VSUPPLY)
 .meas tran Cin_high_V MAX V(cin) FROM=0 TO=8n
 .meas tran Delay_s TRIG V(cin) VAL={VSUP/2} TD=4.5n RISE=1
 + TARG V(cout) VAL={VSUP/2} TD=4.5n RISE=1

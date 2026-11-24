@@ -63,7 +63,7 @@ CCOUT cout 0 {CLOAD_COUT}
 CSUM sum 0 {CLOAD_SUM}
 
 .options plotwinsize=0 reltol=1e-4 gmin=1e-15 numdgt=8
-.save V(a) V(b) V(cin) V(sum) V(cout) V(vdd) I(VSUPPLY)
+.save V(a) V(b) V(cin) V(cbar) V(sbar) V(sum) V(cout) V(vdd) I(VSUPPLY)
 .tran 0 {T0+7.99*HOLD} 0 100p
 .meas tran Cin_high_V MAX V(cin) FROM=0 TO=8n
 .meas tran Delay_s TRIG V(cin) VAL={VSUP/2} TD=4.5n RISE=1
